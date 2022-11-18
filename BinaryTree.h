@@ -10,6 +10,12 @@ public:
     Node<T, V>* parent,left, right;
     Node(const T& key, const V& value, int height=0, Node<T, V>* parent= nullptr,Node<T, V>* left= nullptr,Node<T
          , V>* right= nullptr):  key(key), value(value),height(height),parent(parent), right(right), left(left){};
+
+
+    /**
+     * aids
+     */
+     bool operator==(const Node& node);
 };
 
 
@@ -17,21 +23,18 @@ template <typename T,typename V>
 class BinaryTree {
 //protected:
 public:
-    Node<T, V> * root;
+    Node<K, V> * root;
 
     BinaryTree();
     ~BinaryTree();
-    Node<T, V>& search(const T & target_key) {
-        if (root== nullptr) return nullptr;
-        if (root->key==target_key){ return this; }
-        if (root->key<target_key) {
-            if (root->right== nullptr) return nullptr;}
-    };
+    Node<K, V>* search(const K & target_key, bool return_parent= false);
     int height() { return root->height;};
 
-	void virtual add(const T& key, const V& value )= 0;
-	void virtual remove(const T& key) = 0;
-//	bool friend operator>(const Node<T, V> & first, const Node<T, V> & second);
+    virtual Node<K,V>*  add(const K& key, const V& value );
+    virtual Node<K,V>* remove(const K& key);
+    class NodeAlreadyExists:public std::exception{};
+    class NodeDoesntExists:public std::exception{};
+//	bool friend operator>(const Node<K, V> & first, const Node<K, V> & second);
 
 };
 

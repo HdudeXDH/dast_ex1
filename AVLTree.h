@@ -1,5 +1,6 @@
 #ifndef DAST_EX1_BINARYTREE_H
 #define DAST_EX1_BINARYTREE_H
+#define BAD_BF 4
 #define RETURN_PARENT=true
 #include <assert.h>
 #include <exception>
@@ -78,22 +79,44 @@ Node<K, V>* AVLTree<K, V>::search(const K & target_key, bool return_parent) {
 template <typename K,typename V>
 Node<K,V>*  AVLTree<K,V>::add(const K& key, const V& value ) {
     Node<K, V> *search_result = search(key, true);
+    // key exists
     if (search_result->key == key) {
         throw AVLTree<K,V>::NodeAlreadyExists();
     }
+    // key doesn't exist - set the Node to the root of the tree
     if (search_result == nullptr) {
         Node<K, V> *new_node = shared_ptr<Node<K, V>>(new Node<K, V>(key, value), value);
         this->root = new_node;
         return new_node;
     } else {
+        // insert as is regular Binary tree
         Node<K, V> *new_node = shared_ptr<Node<K, V>>(new Node<K, V>(key, value), value);
-        new_node->
-                parent = search_result;
-        if (search_result > new_node) { // todo Noam implement > operator
+        new_node->parent = search_result;
+        if (search_result > new_node) {
             search_result->left = new_node;
         } else {
             search_result->right = new_node;
         }
+        // AvlTree stuff
+        Node<K, V>* temp_node = new_node;
+        while(temp_node != root) {
+            Node<K, V>* p = temp_node->parent;
+            // if the tree is AVL balanced
+            if (p->height >= temp_node->height){
+                return new_node;
+            } else {
+                // check if rotation needed
+                p->height = temp_node->height + 1;
+                int bf = p->BF();
+                if (bf*bf == BAD_BF) {
+                    rotate(temp_node);
+                    return new_node;
+                }
+                temp_node = temp_node->parent;
+            }
+        }
+        // in case the new node is the root
+        return new_node;
     }
 }
 
@@ -154,4 +177,22 @@ void AVLTree<K,V>::LR_rotate(Node<V,K>* dest){
 //}
 
 
+/**
+ ----------------------------- Node methods ----------------------------
+ */
+
+template <typename K,typename V>
+int Node<K,V>::BF() {
+    return (this->left.height - this->right.hight);
+}
+
+
+template <typename K,typename V>
+bool Node<K,V>::operator==(const Node<K,V>& node) {
+    return node.key==this->key;
+};
+template <typename K,typename V>
+bool Node<K,V>::operator>(const Node<K,V>& node) {
+    return node.key>this->key;
+};
 #endif //DAST_EX1_BINARYTREE_H

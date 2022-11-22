@@ -10,4 +10,4 @@ add_executable(dast_ex1
         main23a1.cpp
         wet1util.h
         worldcup23a1.cpp
-        worldcup23a1.h)
+        worldcup23a1.h Player.h Team.h)

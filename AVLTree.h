@@ -11,7 +11,7 @@ public:
     K key;
     V value;
     int height;
-    Node<K, V>* parent,left, right; //, nextup, nextdown;
+    Node<K, V>* parent,left, right; //, next_up, next_down;
     int BF();
     Node() = delete;
     Node(const K& key, const V& value, int height=0, Node<K, V>* parent= nullptr,Node<K, V>* left= nullptr,
@@ -142,7 +142,7 @@ Node<K,V>* AVLTree<K,V>::remove(const K& key){
     } else if (target->right == nullptr) {
         replace(target, target->left);
     } else {
-            // target has 2 sons
+
         }
 }
 

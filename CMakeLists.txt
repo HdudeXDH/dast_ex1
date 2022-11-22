@@ -7,7 +7,6 @@ include_directories(.)
 
 add_executable(dast_ex1
         AvlTree.h
-        BinaryTree.h
         main23a1.cpp
         wet1util.h
         worldcup23a1.cpp

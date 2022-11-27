@@ -59,7 +59,8 @@ public:
 template <typename K,typename V>
 Node<K, V>* AVLTree<K, V>::search(const K & target_key, bool return_parent) {
     if (root== nullptr) return nullptr;
-    if (root->key==target_key){ return this; }
+	// todo - Alon please approve change
+    if (root->key==target_key){ return this->root; }
     if (root->key<target_key) {
         if (root->right== nullptr)
             if (return_parent){
@@ -77,6 +78,7 @@ Node<K, V>* AVLTree<K, V>::search(const K & target_key, bool return_parent) {
 };
 
 template <typename K,typename V>
+// todo Alon - dont we want here v* value instead of const V& value ?
 Node<K,V>*  AVLTree<K,V>::add(const K& key, const V& value ) {
     Node<K, V> *search_result = search(key, true);
     // key exists

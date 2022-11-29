@@ -1,9 +1,14 @@
 #ifndef DAST_EX1_BINARYTREE_H
 #define DAST_EX1_BINARYTREE_H
 #define BAD_BF 4
-#define RETURN_PARENT=true
 #include <assert.h>
 #include <exception>
+#include <memory>
+
+int max(int a, int b){
+    if (a>b) return a;
+    else return b;
+}
 
 template <typename K, typename V>
 class Node {
@@ -11,17 +16,15 @@ public:
     K key;
     V value;
     int height;
-    Node<K, V>* parent,left, right; //, next_up, next_down;
-    int BF();
+    Node<K,V> * parent;
+    Node<K,V> * left;
+    Node<K,V> * right;
+    Node(const K& key, const V& value, int height=0, Node* parent= nullptr,Node* left= nullptr, Node* right= nullptr):
+    key(key), value(value),height(height),parent(parent),left(left), right(right) {};
     Node() = delete;
-    Node(const K& key, const V& value, int height=0, Node<K, V>* parent= nullptr,Node<K, V>* left= nullptr,
-         Node<K, V>* right= nullptr): //,Node<K, V>* nextup= nullptr,Node<K, V>* nextdown=nullptr
-         key(key), value(value),height(height),parent(parent), right(right), left(left) { //, nextup(nextup),nextdown(nextdown)
-    };
-
-
-     bool operator==(const Node& node);
-     bool operator>(const Node& node);
+    int BF();
+    bool operator==(const Node& node);
+    bool operator>(const Node& node);
 };
 
 
@@ -29,24 +32,23 @@ template <typename K,typename V>
 class AVLTree {
 public:
     Node<K, V> * root;
-
-    AVLTree();
-    ~AVLTree();
-    int height() { return root->height;};
+    AVLTree() : root(nullptr){};
+    ~AVLTree(){ delete root;};
     Node<K, V>* search(const K & target_key, bool return_parent= false);
     virtual Node<K,V>* add(const K& key, const V& value );
     virtual Node<K,V>* remove(const K& key);
-    class NodeAlreadyExists:public std::exception{};
-    class NodeDoesntExists:public std::exception{};
+    void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = false);
     void rotate(Node<V,K>* dest);
     void RR_rotate(Node<V,K>* dest);
     void LL_rotate(Node<V,K>* dest);
     void RL_rotate(Node<V,K>* dest);
     void LR_rotate(Node<V,K>* dest);
+    Node<K,V>* min(Node<K,V>* start);
+    int height() { return get_height(root);};
+    class NodeAlreadyExists:public std::exception{};
+    class NodeDoesntExists:public std::exception{};
 
 //	bool friend operator>(const Node<K, V> & first, const Node<K, V> & second);
-
-    void replace( Node<K, V> *target, Node<K, V> *replace_by);
 };
 
 /**
@@ -59,38 +61,48 @@ public:
 template <typename K,typename V>
 Node<K, V>* AVLTree<K, V>::search(const K & target_key, bool return_parent) {
     if (root== nullptr) return nullptr;
-    if (root->key==target_key){ return this; }
-    if (root->key<target_key) {
-        if (root->right== nullptr)
-            if (return_parent){
-                return root;
+    Node<K,V> * temp = root;
+    while(true) {
+        if (temp->key == target_key) { return temp; }
+        if (temp->key < target_key) {
+            if (temp->right == nullptr) {
+                if (return_parent) {return root;}
+                return nullptr;
             }
-        return nullptr;}
-    else{
-        if (root->left== nullptr)
-            if (return_parent){
-                return root;
+            else{
+                temp=temp->right;
+                continue;
             }
-        return nullptr;
-    }
 
-};
+        } else {
+            if (temp->left == nullptr) {
+                if (return_parent) {return root;}
+                return nullptr;
+            }
+            else{
+                temp=temp->left;
+                continue;
+            }
+        }
+    }
+}
 
 template <typename K,typename V>
 Node<K,V>*  AVLTree<K,V>::add(const K& key, const V& value ) {
     Node<K, V> *search_result = search(key, true);
-    // key exists
-    if (search_result->key == key) {
-        throw AVLTree<K,V>::NodeAlreadyExists();
-    }
+
     // key doesn't exist - set the Node to the root of the tree
     if (search_result == nullptr) {
-        Node<K, V> *new_node = shared_ptr<Node<K, V>>(new Node<K, V>(key, value), value);
+        Node<K, V> *new_node = new Node<K, V>(key, value);//std::shared_ptr<Node<K, V>>(new Node<K, V>(key, value));
         this->root = new_node;
         return new_node;
     } else {
+        // key exists
+        if (search_result->key == key) {
+            throw AVLTree<K,V>::NodeAlreadyExists();
+        }
         // insert as is regular Binary tree
-        Node<K, V> *new_node = shared_ptr<Node<K, V>>(new Node<K, V>(key, value), value);
+        Node<K, V> *new_node = new Node<K, V>(key, value);//std::shared_ptr<Node<K, V>>(new Node<K, V>(key, value), value);
         new_node->parent = search_result;
         if (search_result > new_node) {
             search_result->left = new_node;
@@ -102,11 +114,11 @@ Node<K,V>*  AVLTree<K,V>::add(const K& key, const V& value ) {
         while(temp_node != root) {
             Node<K, V>* p = temp_node->parent;
             // if the tree is AVL balanced
-            if (p->height >= temp_node->height){
+            if (get_height(p) >= get_height(temp_node)){
                 return new_node;
             } else {
                 // check if rotation needed
-                p->height = temp_node->height + 1;
+                p->height = get_height(temp_node) + 1;
                 int bf = p->BF();
                 if (bf*bf == BAD_BF) {
                     rotate(temp_node);
@@ -119,41 +131,125 @@ Node<K,V>*  AVLTree<K,V>::add(const K& key, const V& value ) {
         return new_node;
     }
 }
+template <typename K,typename V>
+void AVLTree<K,V>::rotate(Node<V,K>* dest){
+    int balance = dest->BF();
+    if (balance > 1 && dest->left->BF()>=0)
+        return LL_rotate(dest);
+    if (balance > 1 && dest->left->BF()==-1)
+        return LR_rotate(dest);
+    if (balance <-1 && dest->right->BF()<=0)
+        return RR_rotate(dest);
+    if (balance <-1 && dest->right->BF()==1)
+        return RL_rotate(dest);
+
+
+};
+
+template <typename K,typename V>
+Node<K,V>* AVLTree<K,V>::min( Node<K,V>* start) {
+    while (start->left != nullptr){
+        start = start->left;
+    }
+    return start;
+}
 
 template <typename K,typename V>
 Node<K,V>* AVLTree<K,V>::remove(const K& key){
     Node<K, V> *target = search(key);
+    Node<K, V> * temp;
     if (target == nullptr){
         throw AVLTree<K,V>::NodeDoesntExists();
     }
     // there is a node, lets delete it
-    Node<K,V>* p = target->parent;
-    if (p == nullptr) {
-        // todo delete root
-    }
-    // if node is leaf
-//    if (target->left == nullptr && target->right == nullptr) {
-//        replace(target, nullptr);
-//        delete target;
+//    Node<K,V>* p = target->parent;
+//    if (p == nullptr) {
+//        // todo delete root
 //    }
+    // if node is leaf
+    if (target->left == nullptr && target->right == nullptr) {
+        replace(target, nullptr);
+        delete target;
+    }
     // Not root not leaf
     else if (target->left == nullptr) {
+        temp = target->right;
         replace(target, target->right);
+        //todo check deletion
     } else if (target->right == nullptr) {
+        temp = target->right;
         replace(target, target->left);
+        //todo check deletion
     } else {
-
+        Node<K, V> *temp = AVLTree<K,V>::min(target->right);
+        replace(target, temp);
         }
+    //AVL_balancing
+    if (temp== nullptr){return temp;}
+    temp->height=1+max(get_height(temp->left),get_height(temp->right));
+    while(temp != root) {
+        Node<K, V>* p = temp->parent;
+        // if the tree is AVL balanced
+        if (get_height(p) >= get_height(temp)){
+            return temp;
+        } else {
+            // check if rotation needed
+            p->height = get_height(temp) + 1;
+            int bf = p->BF();
+            if (bf*bf == BAD_BF) {
+                rotate(temp);
+                return temp;
+            }
+            temp = temp->parent;
+        }
+    }
+    return nullptr;
 }
 
 template<typename K, typename  V>
-void AVLTree<K,V>::replace(Node<K, V> *target, Node<K, V> *replace_by) {
+void AVLTree<K,V>::replace(Node<K, V> *target, Node<K, V> *replace_by, bool remove) {
     Node<K, V> * p = target->parent;
     if (target == target->parent->right) {
         p->right = nullptr;
     } else {
         p->left = nullptr;
     }
+};
+
+template <typename K,typename V>
+void AVLTree<K,V>::RR_rotate(Node<V,K>* dest){
+    //todo: validate
+    Node<K,V> *x = dest->left;
+    Node<K,V> *T2 = x->right;
+
+    // Perform rotation
+    x->right = dest;
+    dest->left = T2;
+
+    // Update heights
+    dest->height = max(get_height(dest->left),
+                    get_height(dest->right)) + 1;
+    x->height = max(get_height(x->left),
+                    get_height(x->right)) + 1;
+
+//    // Return new root
+//    return x;
+};
+template <typename K,typename V>
+void AVLTree<K,V>::LL_rotate(Node<V,K>* dest){
+    Node<K,V> *y = dest->right;
+    Node<K,V> *T2 = y->left;
+
+    // Perform rotation
+    y->left = dest;
+    dest->right = T2;
+
+    // Update heights
+    dest->height = max(get_height(dest->left),
+                    get_height(dest->right)) + 1;
+    y->height = max(get_height(y->left),
+                    get_height(y->right)) + 1;
+
 };
 
 template <typename K,typename V>
@@ -167,32 +263,37 @@ void AVLTree<K,V>::LR_rotate(Node<V,K>* dest){
     RR_rotate(dest);
     LL_rotate(dest->parent);
 };
-//template< typename K, typename V>
-//Node<T,V>::Node(const T& key, const V& value, int height, Node<T, V>* parent ,Node<T, V>* left ,Node<T
-//        , V>* right):  key(key), value(value),height(height),parent(parent), right(right), left(left){};
 
-//template<typename K, typename V>
-//bool operator>(const Node<T, V> & first, const Node<T, V> & second) {
-//	return first.key > second.key;
-//}
 
 
 /**
  ----------------------------- Node methods ----------------------------
  */
 
+
+template <typename K,typename V>
+int get_height(Node<V,K>* target){
+    if (target== nullptr) return 0;
+    else return target->height;
+}
+template <typename K,typename V>
+int getBalance( Node<K,V>* target){
+    if (target== nullptr) return 0;
+    else return target->BF();
+}
+//todo: add
 template <typename K,typename V>
 int Node<K,V>::BF() {
-    return (this->left.height - this->right.hight);
+    return (get_height(this->left) - get_height(this->right));
 }
-
-
-template <typename K,typename V>
-bool Node<K,V>::operator==(const Node<K,V>& node) {
-    return node.key==this->key;
-};
-template <typename K,typename V>
-bool Node<K,V>::operator>(const Node<K,V>& node) {
-    return node.key>this->key;
-};
+//
+//
+//template <typename K,typename V>
+//bool Node<K,V>::operator==(const Node<K,V>& node) {
+//    return node.key==this->key;
+//};
+//template <typename K,typename V>
+//bool Node<K,V>::operator>(const Node<K,V>& node) {
+//    return node.key>this->key;
+//};
 #endif //DAST_EX1_BINARYTREE_H

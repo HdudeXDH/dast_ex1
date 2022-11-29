@@ -13,13 +13,29 @@ world_cup_t::~world_cup_t()
 
 StatusType world_cup_t::add_team(int teamId, int points)
 {
-	// TODO: Your code goes here
-	return StatusType::SUCCESS;
+	if (teamId <= 0 || points < 0) {
+		return StatusType::INVALID_INPUT;
+	}
+	// todo Noam- check the problem with the search method
+	Node<Team_id, Team> *search_result = teams.search(teamId, true);
+	if(search_result.key == teamId) {
+		return StatusType::FAILURE;
+	}
+	try {
+		// todo maybe smart ptrs ?
+		Team* new_team = new Team(teamId, points);
+		teams.add(teamId, *new_team);
+	}
+	// todo check syntax correctness
+	catch (std::bad_alloc& err){
+		return StatusType::ALLOCATION_ERROR;
+	}
+//	else
+//	return StatusType::SUCCESS;
 }
 
 StatusType world_cup_t::remove_team(int teamId)
 {
-	// TODO: Your code goes here
 	return StatusType::FAILURE;
 }
 

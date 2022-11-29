@@ -6,7 +6,7 @@ class Utils {
 public:
 
     template <typename K,typename V>
-    void printNode(Node<K, V>* node);
+    void printNode(Node<K, V>* node, int indent=0);
 
     template <typename K,typename V>
     void printTree(AVLTree<K, V>* tree);

@@ -35,9 +35,9 @@ public:
     Node<K, V> * root;
     AVLTree() : root(nullptr){};
     ~AVLTree(){ delete root;};
-    Node<K, V>* search(const K & target_key, bool return_parent= false);
+    Node<K, V>* search(const K & target_key, bool return_parent= false, Node<K, V> *start_node = nullptr);
     virtual Node<K,V>* add(const K& key, const V& value );
-    virtual Node<K,V>* remove(const K& key);
+    virtual Node<K,V>* remove(const K& key, Node<K, V> *start_node= nullptr);
     void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = true);
     void rotate(Node<V,K>* dest);
     void RR_rotate(Node<V,K>* dest);
@@ -60,9 +60,12 @@ public:
  ----------------- AVL implementations ----------------------------
  */
 template <typename K,typename V>
-Node<K, V>* AVLTree<K, V>::search(const K & target_key, bool return_parent) {
-    if (root== nullptr) return nullptr;
-    Node<K,V> * temp = root;
+Node<K, V>* AVLTree<K, V>::search(const K & target_key, bool return_parent, Node<K, V> *start_node) {
+	if (start_node == nullptr){
+		start_node = root;
+	}
+    if (start_node == nullptr) return nullptr;
+    Node<K,V> * temp = start_node;
     while(true) {
         if (temp->key == target_key) { return temp; }
         if (temp->key < target_key) {
@@ -157,8 +160,8 @@ Node<K,V>* AVLTree<K,V>::min( Node<K,V>* start) {
 }
 
 template <typename K,typename V>
-Node<K,V>* AVLTree<K,V>::remove(const K& key){
-    Node<K, V> *target = search(key);
+Node<K,V>* AVLTree<K,V>::remove(const K& key, Node<K, V> *start_node){
+	Node<K, V> *target = search(key, false, start_node);
     Node<K, V> * temp;
     if (target == nullptr){
         throw AVLTree<K,V>::NodeDoesntExists();
@@ -186,27 +189,28 @@ Node<K,V>* AVLTree<K,V>::remove(const K& key){
     } else {
         temp = AVLTree<K,V>::min(target->right);
         replace(target, temp);
+		remove(temp->key, temp->right);
     }
-    //AVL_balancing
-    if (temp== nullptr){return temp;}
-    temp->height=1+max(get_height(temp->left),get_height(temp->right));
-    while(temp != root) {
-        Node<K, V>* p = temp->parent;
-        // if the tree is AVL balanced
-        if (get_height(p) >= get_height(temp)){
-            return temp;
-        } else {
-            // check if rotation needed
-            p->height = get_height(temp) + 1;
-            int bf = p->BF();
-            if (bf*bf == BAD_BF) {
-                rotate(p);
-                return temp;
-            }
-            temp = temp->parent;
-        }
-    }
-    return nullptr;
+//    //AVL_balancing
+//    if (temp== nullptr){return temp;}
+//    temp->height=1+max(get_height(temp->left),get_height(temp->right));
+//    while(temp != root) {
+//        Node<K, V>* p = temp->parent;
+//        // if the tree is AVL balanced
+//        if (get_height(p) >= get_height(temp)){
+//            return temp;
+//        } else {
+//            // check if rotation needed
+//            p->height = get_height(temp) + 1;
+//            int bf = p->BF();
+//            if (bf*bf == BAD_BF) {
+//                rotate(p);
+//                return temp;
+//            }
+//            temp = temp->parent;
+//        }
+//    }
+//    return nullptr;
 }
 
 template<typename K, typename  V>

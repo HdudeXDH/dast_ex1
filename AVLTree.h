@@ -37,7 +37,7 @@ public:
     Node<K, V>* search(const K & target_key, bool return_parent= false);
     virtual Node<K,V>* add(const K& key, const V& value );
     virtual Node<K,V>* remove(const K& key);
-    void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = false);
+    void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = true);
     void rotate(Node<V,K>* dest);
     void RR_rotate(Node<V,K>* dest);
     void LL_rotate(Node<V,K>* dest);
@@ -163,10 +163,10 @@ Node<K,V>* AVLTree<K,V>::remove(const K& key){
     }
     // there is a node, lets delete it
     Node<K,V>* p = target->parent;
-    if (p == nullptr) {
-        root= nullptr;
-        //todo check deletion
-    }
+//    if (p == nullptr) {
+//        root= nullptr;
+//        //todo check deletion
+//    }
     // if node is leaf
     if (target->left == nullptr && target->right == nullptr) {
         replace(target, nullptr);
@@ -209,12 +209,50 @@ Node<K,V>* AVLTree<K,V>::remove(const K& key){
 
 template<typename K, typename  V>
 void AVLTree<K,V>::replace(Node<K, V> *target, Node<K, V> *replace_by, bool remove) {
-    Node<K, V> * p = target->parent;
-    if (target == target->parent->right) {
-        p->right = nullptr;
-    } else {
-        p->left = nullptr;
+    Node<K, V> * by_parent= nullptr;
+    Node<K, V> * by_right= nullptr;
+    Node<K, V> * by_left= nullptr;
+    if (replace_by!= nullptr){
+        by_parent=replace_by->parent;
+        by_left=replace_by->left;
+        by_right=replace_by->right;
     }
+    Node<K, V> * target_p= target->parent;
+    Node<K, V> * target_right=target->right;
+    Node<K, V> * target_left=target->left;
+
+    if (target_right!= nullptr) target_right->parent=replace_by;
+    if (target_left!= nullptr) target_left->parent=replace_by;
+    if (target_p!= nullptr) {
+        if(target_p->left==target){
+            target_p->left= replace_by;
+        }
+        else target_p->right= replace_by;
+    }
+    else{
+        root=replace_by;
+        replace_by->parent= nullptr;
+    }
+    if (by_parent!= nullptr&&remove){
+        if (by_parent->left==replace_by){
+            by_parent->left= nullptr;
+        }
+        else {by_parent->right= nullptr;}
+    }
+    if (replace_by!= nullptr&&(!remove)){
+        replace_by->right= target_right;
+        replace_by->left=target_left;
+        if (by_parent!= nullptr) {
+            if(by_parent->left==replace_by){
+                by_parent->left= target;
+            }
+            else by_parent->right= target;
+        }
+        else{root=target;}
+    }
+
+
+
 };
 
 template <typename K,typename V>
@@ -228,6 +266,7 @@ void AVLTree<K,V>::LL_rotate(Node<V,K>* dest){
     dest->left = T2;
     if (dest==root){
         root=x;
+        root->parent= nullptr;
     }
 
     // Update heights
@@ -249,6 +288,7 @@ void AVLTree<K,V>::RR_rotate(Node<V,K>* dest){
     dest->right = T2;
     if (dest==root){
         root=y;
+        root->parent= nullptr;
     }
 
     // Update heights

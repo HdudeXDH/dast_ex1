@@ -184,9 +184,9 @@ Node<K,V>* AVLTree<K,V>::remove(const K& key){
         replace(target, target->left);
         //todo check deletion
     } else {
-        Node<K, V> *temp = AVLTree<K,V>::min(target->right);
+        temp = AVLTree<K,V>::min(target->right);
         replace(target, temp);
-        }
+    }
     //AVL_balancing
     if (temp== nullptr){return temp;}
     temp->height=1+max(get_height(temp->left),get_height(temp->right));
@@ -315,6 +315,12 @@ void AVLTree<K,V>::LR_rotate(Node<V,K>* dest){
     LL_rotate(dest->parent);
 };
 
+
+
+/**
+ * aids
+ */
+//void
 
 
 /**

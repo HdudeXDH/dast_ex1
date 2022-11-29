@@ -25,6 +25,7 @@ public:
     int BF();
     bool operator==(const Node& node);
     bool operator>(const Node& node);
+    void print();
 };
 
 
@@ -234,6 +235,8 @@ void AVLTree<K,V>::replace(Node<K, V> *target, Node<K, V> *replace_by, bool remo
         root=replace_by;
         replace_by->parent= nullptr;
     }
+    replace_by->right=target_right;
+    replace_by->left=target_left;
     if (by_parent!= nullptr&&remove){
         if (by_parent->left==replace_by){
             by_parent->left= nullptr;

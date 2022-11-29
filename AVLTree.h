@@ -19,7 +19,7 @@ public:
     Node<K,V> * parent;
     Node<K,V> * left;
     Node<K,V> * right;
-    Node(const K& key, const V& value, int height=0, Node* parent= nullptr,Node* left= nullptr, Node* right= nullptr):
+    Node(const K& key, const V& value, int height=1, Node* parent= nullptr,Node* left= nullptr, Node* right= nullptr):
     key(key), value(value),height(height),parent(parent),left(left), right(right) {};
     Node() = delete;
     int BF();
@@ -66,7 +66,7 @@ Node<K, V>* AVLTree<K, V>::search(const K & target_key, bool return_parent) {
         if (temp->key == target_key) { return temp; }
         if (temp->key < target_key) {
             if (temp->right == nullptr) {
-                if (return_parent) {return root;}
+                if (return_parent) {return temp;}
                 return nullptr;
             }
             else{
@@ -76,7 +76,7 @@ Node<K, V>* AVLTree<K, V>::search(const K & target_key, bool return_parent) {
 
         } else {
             if (temp->left == nullptr) {
-                if (return_parent) {return root;}
+                if (return_parent) {return temp;}
                 return nullptr;
             }
             else{
@@ -114,14 +114,14 @@ Node<K,V>*  AVLTree<K,V>::add(const K& key, const V& value ) {
         while(temp_node != root) {
             Node<K, V>* p = temp_node->parent;
             // if the tree is AVL balanced
-            if (get_height(p) >= get_height(temp_node)){
+            if (get_height(p) >= get_height(temp_node)+1){
                 return new_node;
             } else {
                 // check if rotation needed
                 p->height = get_height(temp_node) + 1;
                 int bf = p->BF();
                 if (bf*bf == BAD_BF) {
-                    rotate(temp_node);
+                    rotate(p);
                     return new_node;
                 }
                 temp_node = temp_node->parent;
@@ -162,10 +162,11 @@ Node<K,V>* AVLTree<K,V>::remove(const K& key){
         throw AVLTree<K,V>::NodeDoesntExists();
     }
     // there is a node, lets delete it
-//    Node<K,V>* p = target->parent;
-//    if (p == nullptr) {
-//        // todo delete root
-//    }
+    Node<K,V>* p = target->parent;
+    if (p == nullptr) {
+        root= nullptr;
+        //todo check deletion
+    }
     // if node is leaf
     if (target->left == nullptr && target->right == nullptr) {
         replace(target, nullptr);
@@ -197,7 +198,7 @@ Node<K,V>* AVLTree<K,V>::remove(const K& key){
             p->height = get_height(temp) + 1;
             int bf = p->BF();
             if (bf*bf == BAD_BF) {
-                rotate(temp);
+                rotate(p);
                 return temp;
             }
             temp = temp->parent;
@@ -217,7 +218,7 @@ void AVLTree<K,V>::replace(Node<K, V> *target, Node<K, V> *replace_by, bool remo
 };
 
 template <typename K,typename V>
-void AVLTree<K,V>::RR_rotate(Node<V,K>* dest){
+void AVLTree<K,V>::LL_rotate(Node<V,K>* dest){
     //todo: validate
     Node<K,V> *x = dest->left;
     Node<K,V> *T2 = x->right;
@@ -225,6 +226,9 @@ void AVLTree<K,V>::RR_rotate(Node<V,K>* dest){
     // Perform rotation
     x->right = dest;
     dest->left = T2;
+    if (dest==root){
+        root=x;
+    }
 
     // Update heights
     dest->height = max(get_height(dest->left),
@@ -236,13 +240,16 @@ void AVLTree<K,V>::RR_rotate(Node<V,K>* dest){
 //    return x;
 };
 template <typename K,typename V>
-void AVLTree<K,V>::LL_rotate(Node<V,K>* dest){
+void AVLTree<K,V>::RR_rotate(Node<V,K>* dest){
     Node<K,V> *y = dest->right;
     Node<K,V> *T2 = y->left;
 
     // Perform rotation
     y->left = dest;
     dest->right = T2;
+    if (dest==root){
+        root=y;
+    }
 
     // Update heights
     dest->height = max(get_height(dest->left),
@@ -276,12 +283,12 @@ int get_height(Node<V,K>* target){
     if (target== nullptr) return 0;
     else return target->height;
 }
-template <typename K,typename V>
-int getBalance( Node<K,V>* target){
-    if (target== nullptr) return 0;
-    else return target->BF();
-}
-//todo: add
+//template <typename K,typename V>
+//int getBalance( Node<K,V>* target){
+//    if (target== nullptr) return 0;
+//    else return target->BF();
+//}
+
 template <typename K,typename V>
 int Node<K,V>::BF() {
     return (get_height(this->left) - get_height(this->right));

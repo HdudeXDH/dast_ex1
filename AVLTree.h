@@ -22,6 +22,8 @@ public:
     Node(const K& key, const V& value, int height=1, Node* parent= nullptr,Node* left= nullptr, Node* right= nullptr):
     key(key), value(value),height(height),parent(parent),left(left), right(right) {};
     Node() = delete;
+	bool has_two_sons();
+	bool is_leaf();
     int BF();
     bool operator==(const Node& node);
     bool operator>(const Node& node);
@@ -33,21 +35,25 @@ template <typename K,typename V>
 class AVLTree {
 public:
     Node<K, V> * root;
-    AVLTree() : root(nullptr){};
-    ~AVLTree(){ delete root;};
-    Node<K, V>* search(const K & target_key, bool return_parent= false, Node<K, V> *start_node = nullptr);
-    virtual Node<K,V>* add(const K& key, const V& value );
-    virtual Node<K,V>* remove(const K& key, Node<K, V> *start_node= nullptr);
-    void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = true);
-    void rotate(Node<V,K>* dest);
-    void RR_rotate(Node<V,K>* dest);
-    void LL_rotate(Node<V,K>* dest);
-    void RL_rotate(Node<V,K>* dest);
-    void LR_rotate(Node<V,K>* dest);
-    Node<K,V>* min(Node<K,V>* start);
-    int height() { return get_height(root);};
-    class NodeAlreadyExists:public std::exception{};
-    class NodeDoesntExists:public std::exception{};
+	AVLTree() : root(nullptr){};
+	~AVLTree(){ delete root;};
+	Node<K, V>* search(const K & target_key, bool return_parent= false, Node<K, V> *start_node = nullptr);
+	virtual Node<K,V>* add(const K& key, const V& value );
+	virtual Node<K,V>* remove_by_key(const K& key, Node<K, V> *start_node= nullptr);
+	virtual Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
+	void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = true);
+	void swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2);
+	void remove_leaf(Node<K, V> *leaf_to_remove);
+	void remove_link_from_chain(Node<K, V> *node_to_remove);
+	void rotate(Node<V,K>* dest);
+	void RR_rotate(Node<V,K>* dest);
+	void LL_rotate(Node<V,K>* dest);
+	void RL_rotate(Node<V,K>* dest);
+	void LR_rotate(Node<V,K>* dest);
+	Node<K,V>* min(Node<K,V>* start);
+	int height() { return get_height(root);};
+	class NodeAlreadyExists:public std::exception{};
+	class NodeDoesntExists:public std::exception{};
 
 //	bool friend operator>(const Node<K, V> & first, const Node<K, V> & second);
 };
@@ -160,108 +166,174 @@ Node<K,V>* AVLTree<K,V>::min( Node<K,V>* start) {
 }
 
 template <typename K,typename V>
-Node<K,V>* AVLTree<K,V>::remove(const K& key, Node<K, V> *start_node){
+Node<K,V>* AVLTree<K,V>::remove_by_key(const K& key, Node<K, V> *start_node){
 	Node<K, V> *target = search(key, false, start_node);
-    Node<K, V> * temp;
     if (target == nullptr){
         throw AVLTree<K,V>::NodeDoesntExists();
     }
-    // there is a node, lets delete it
-    Node<K,V>* p = target->parent;
-//    if (p == nullptr) {
-//        root= nullptr;
-//        //todo check deletion
-//    }
-    // if node is leaf
-    if (target->left == nullptr && target->right == nullptr) {
-        replace(target, nullptr);
-        delete target;
-    }
-    // Not root not leaf
-    else if (target->left == nullptr) {
-        temp = target->right;
-        replace(target, target->right);
-        //todo check deletion
-    } else if (target->right == nullptr) {
-        temp = target->right;
-        replace(target, target->left);
-        //todo check deletion
-    } else {
-        temp = AVLTree<K,V>::min(target->right);
-        replace(target, temp);
-		remove(temp->key, temp->right);
-    }
-//    //AVL_balancing
-//    if (temp== nullptr){return temp;}
-//    temp->height=1+max(get_height(temp->left),get_height(temp->right));
-//    while(temp != root) {
-//        Node<K, V>* p = temp->parent;
-//        // if the tree is AVL balanced
-//        if (get_height(p) >= get_height(temp)){
-//            return temp;
-//        } else {
-//            // check if rotation needed
-//            p->height = get_height(temp) + 1;
-//            int bf = p->BF();
-//            if (bf*bf == BAD_BF) {
-//                rotate(p);
-//                return temp;
-//            }
-//            temp = temp->parent;
-//        }
-//    }
-//    return nullptr;
+	remove_Node(target, start_node);
+	/**
+	 *
+    //AVL_balancing
+    if (temp== nullptr){return temp;}
+    temp->height=1+max(get_height(temp->left),get_height(temp->right));
+    while(temp != root) {
+        Node<K, V>* p = temp->parent;
+        // if the tree is AVL balanced
+        if (get_height(p) >= get_height(temp)){
+            return temp;
+        } else {
+            // check if rotation needed
+            p->height = get_height(temp) + 1;
+            int bf = p->BF();
+            if (bf*bf == BAD_BF) {
+                rotate(p);
+                return temp;
+            }
+            temp = temp->parent;
+        }
+    } **/
+    return nullptr;
+}
+
+template <typename K,typename V>
+Node<K,V>* AVLTree<K,V>::remove_Node(Node<K, V> *to_remove, Node<K, V> *start_node) {
+	Node<K, V> * follower;
+	bool has_two_sons = to_remove->has_two_sons();
+	// if node is leaf
+	if (to_remove->is_leaf()) {
+		AVLTree::remove_leaf(to_remove);
+	}
+	else if (!has_two_sons) {
+		AVLTree::remove_link_from_chain(to_remove);
+	} else {
+		follower = AVLTree<K,V>::min(to_remove->right);
+		swap_keys_and_values(to_remove, follower);
+		remove_Node(follower, to_remove->right);
+	}
+}
+
+template<typename K, typename  V>
+void AVLTree<K,V>::swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2) {
+	K temp_key = node1->key;
+	node1->key = node2->key;
+	node2->key = temp_key;
+
+	V temp_value = node1->value;
+	node1->value = node2->value;
+	node2->value = temp_value;
+}
+
+template<typename K, typename  V>
+void AVLTree<K,V>::remove_leaf(Node<K, V> *leaf_to_remove){
+	assert(leaf_to_remove->right == nullptr && leaf_to_remove->left == nullptr);
+	Node<K,V> *parent = leaf_to_remove->parent;
+	if (parent->left == leaf_to_remove) {
+		parent->left = nullptr;
+	} else {
+		assert(parent->right == leaf_to_remove);
+		parent->right = nullptr;
+	}
+	delete leaf_to_remove;
+}
+
+template<typename K, typename  V>
+void AVLTree<K,V>::remove_link_from_chain(Node<K, V> *node_to_remove){
+	assert(!(node_to_remove->is_leaf())&& !(node_to_remove->has_two_sons()));
+	Node<K,V> *son;
+	Node<K,V> *parent = node_to_remove->parent;
+	// handle son
+	if(node_to_remove->right == nullptr) {
+		assert(node_to_remove->left != nullptr);
+		son = node_to_remove->left;
+	} else {
+		assert(node_to_remove->right != nullptr);
+		son = node_to_remove->right;
+	}
+	son->parent = parent;
+
+	// handle parent
+	// if node_to_remove is not root
+	if (parent != nullptr) {
+		if (parent->left == node_to_remove) {
+			parent->left = son;
+		} else {
+			assert(parent->right == node_to_remove);
+			parent->right = son;
+		}
+	} else {
+		this->root = son;
+	}
+	delete node_to_remove;
 }
 
 template<typename K, typename  V>
 void AVLTree<K,V>::replace(Node<K, V> *target, Node<K, V> *replace_by, bool remove) {
-    Node<K, V> * by_parent= nullptr;
-    Node<K, V> * by_right= nullptr;
-    Node<K, V> * by_left= nullptr;
-    if (replace_by!= nullptr){
-        by_parent=replace_by->parent;
-        by_left=replace_by->left;
-        by_right=replace_by->right;
-    }
-    Node<K, V> * target_p= target->parent;
-    Node<K, V> * target_right=target->right;
-    Node<K, V> * target_left=target->left;
+	target->value = replace_by;
 
-    if (target_right!= nullptr) target_right->parent=replace_by;
-    if (target_left!= nullptr) target_left->parent=replace_by;
-    if (target_p!= nullptr) {
-        if(target_p->left==target){
-            target_p->left= replace_by;
-        }
-        else target_p->right= replace_by;
-    }
-    else{
-        root=replace_by;
-        replace_by->parent= nullptr;
-    }
-    replace_by->right=target_right;
-    replace_by->left=target_left;
-    if (by_parent!= nullptr&&remove){
-        if (by_parent->left==replace_by){
-            by_parent->left= nullptr;
-        }
-        else {by_parent->right= nullptr;}
-    }
-    if (replace_by!= nullptr&&(!remove)){
-        replace_by->right= target_right;
-        replace_by->left=target_left;
-        if (by_parent!= nullptr) {
-            if(by_parent->left==replace_by){
-                by_parent->left= target;
-            }
-            else by_parent->right= target;
-        }
-        else{root=target;}
-    }
+}
+
+template<typename K, typename  V>
+bool Node<K, V>::has_two_sons() {
+	return !((this->right == nullptr) || (this->left == nullptr));
+}
+
+template<typename K, typename  V>
+bool Node<K, V>::is_leaf() {
+	return ((this->right == nullptr) && (this->left == nullptr));
+}
 
 
-
-};
+//
+//template<typename K, typename  V>
+//void AVLTree<K,V>::replace(Node<K, V> *target, Node<K, V> *replace_by, bool remove_by_key) {
+//    Node<K, V> * by_parent= nullptr;
+//    Node<K, V> * by_right= nullptr;
+//    Node<K, V> * by_left= nullptr;
+//    if (replace_by!= nullptr){
+//        by_parent=replace_by->parent;
+//        by_left=replace_by->left;
+//        by_right=replace_by->right;
+//    }
+//    Node<K, V> * target_p= target->parent;
+//    Node<K, V> * target_right=target->right;
+//    Node<K, V> * target_left=target->left;
+//
+//    if (target_right!= nullptr) target_right->parent=replace_by;
+//    if (target_left!= nullptr) target_left->parent=replace_by;
+//    if (target_p!= nullptr) {
+//        if(target_p->left==target){
+//            target_p->left= replace_by;
+//        }
+//        else target_p->right= replace_by;
+//    }
+//    else{
+//        root=replace_by;
+//        replace_by->parent= nullptr;
+//    }
+//    replace_by->right=target_right;
+//    replace_by->left=target_left;
+//    if (by_parent!= nullptr&&remove_by_key){
+//        if (by_parent->left==replace_by){
+//            by_parent->left= nullptr;
+//        }
+//        else {by_parent->right= nullptr;}
+//    }
+//    if (replace_by!= nullptr&&(!remove_by_key)){
+//        replace_by->right= target_right;
+//        replace_by->left=target_left;
+//        if (by_parent!= nullptr) {
+//            if(by_parent->left==replace_by){
+//                by_parent->left= target;
+//            }
+//            else by_parent->right= target;
+//        }
+//        else{root=target;}
+//    }
+//
+//
+//
+//};
 
 template <typename K,typename V>
 void AVLTree<K,V>::LL_rotate(Node<V,K>* dest){

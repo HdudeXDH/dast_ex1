@@ -30,16 +30,16 @@ public:
 
 int main() {
 
-    AVLTree<int,int> a;
-    a.add(1,2);
-    a.add(2,2);
-    a.add(3,2);
-    a.add(4,2);
-//	a.remove_by_key(2);
-    a.add(-1,2);
-    int ix = 0;
-    Key_Value_block<int,int> *array[a.size];
-    a.add(-1,2);
+//    AVLTree<int,int> a;
+//    a.add(1,2);
+//    a.add(2,2);
+//    a.add(3,2);
+//    a.add(4,2);
+////	a.remove_by_key(2);
+//    a.add(-1,2);
+//    int ix = 0;
+//    Key_Value_block<int,int> *array[a.size];
+////    a.add(-1,2);
 
 
 test_insertion_deletion();

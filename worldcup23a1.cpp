@@ -1,6 +1,6 @@
 #include "worldcup23a1.h"
 
-world_cup_t::world_cup_t(): top_scorrer(nullptr)
+world_cup_t::world_cup_t(): top_scorrer(nullptr), players_count(EMPTY_NUM)
 {
 	players_by_id = new AVLTree<Player_id, Player*>();
 	players_by_level = new AVLTree<PlayerLevel, Player*>();
@@ -25,7 +25,7 @@ StatusType world_cup_t::add_team(int teamId, int points)
 //	}
 	try {
 		Team* new_team = new Team(teamId, points);
-		teams.add(teamId, *new_team);
+		teams.add(teamId, new_team);
 	}
 	catch (AVLTree<teamId, Team>::NodeAlreadyExists& err) {
 		return StatusType::FAILURE;
@@ -66,7 +66,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
                                    int goals, int cards, bool goalKeeper)
 {
 	if (playerId <= 0 || teamId <= 0 || gamesPlayed <= 0 || goals <=0 || cards <= 0 ) {
-		retunr StatusType::INVALID_INPUT;
+		return StatusType::INVALID_INPUT;
 	}
 	Node<Team_id, Team> *team_search_result = teams.search(teamId);
 	Node<Player_id, Player> *player_search_result = players_by_id.search(playerId);
@@ -233,9 +233,9 @@ output_t<int> world_cup_t::get_all_players_count(int teamId)
 		if (team == nullptr) {
 			return output_t<int>(StatusType::FAILURE);
 		}
-		return team->players_count;
+		return output_t<int>(team->players_count);
 	} else {
-		return players_count;
+		return output_t<int>(players_count);
 	}
 	// TODO: Your code goes here ?????
 //    static int i = 0;

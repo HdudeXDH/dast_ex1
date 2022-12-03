@@ -14,7 +14,7 @@ public:
 	// members
 	int id;
 	int points;
-	AVLTree<PlayerLevel, Player> players;
+	AVLTree<PlayerLevel, Player*> players;
 	Player* top_scorrer;
 	int players_count;
 	int goal_keepers_count;

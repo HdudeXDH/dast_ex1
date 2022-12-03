@@ -13,5 +13,14 @@ bool PlayerLevel::operator>(PlayerLevel* level1, PlayerLevel* level2) {
 
 Player::Player(int playerId, Team* team, int gamesPlayed, int goals, int cards, bool goalKeeper):
 		id(playerId), team(team), games_played(gamesPlayed), goals(goals), is_goal_keeper(goalKeeper) {
-	PlayerLevel *player_level = new PlayerLevel(goals, cards, playerId);
+	level = new PlayerLevel(goals, cards, playerId);
+}
+
+void Player::update_level() {
+	level->cards = cards;
+	level->goals = goals;
+}
+
+int Player::get_total_games_played() {
+	return (team->games_played + games_played);
 }

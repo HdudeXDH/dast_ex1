@@ -29,6 +29,7 @@ private:
 	AVLTree<PlayerLevel*, Player*> players_by_level;
 	AVLTree<Team_id ,Team*> teams;
 	Player* top_scorrer;
+	int players_count;
 	
 public:
 	// <DO-NOT-MODIFY> {

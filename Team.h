@@ -4,37 +4,39 @@
 #include "Player.h"
 #define EMPTY_NUM 0
 #define ZERO 0
+#define MINIMUM_TEAM_SIZE_FOR_MATCH 11
 
 class Player;
 class Team {
 private:
 
 public:
-	// todo - to be private
+	// members
 	int id;
 	int points;
-	AVLTree<Player, Player>* players;
+	AVLTree<PlayerLevel, Player> players;
 	Player* top_scorrer;
 	int players_count;
-	bool has_goal_keeper;
+	int goal_keepers_count;
+	// power == sum (goals - cards)
 	int power;
 	int games_played;
 
-	// public methods
+	// big 3
     Team() = delete;
-    Team(int id, int points, AVLTree<Player, Player>* players = nullptr, Player* top_scorrer = nullptr,
-		 int players_count = EMPTY_NUM, int power = ZERO, int games_played = ZERO, bool has_goal_keeper = false);
+	Team(int id, int points);
+	~Team() = default;
 
-    ~Team() = default;
-    /**
-     * those methods are for the Team only, and will be executed from the add_player and remove_player methods
-     * **/
-    Node<int, Player&>* add_player_to_team(Player& player);
-    Node<int, Player&>* remove_player_from_team(Player& player);
+	// other methods
+    void add_player_to_team(Player* player);
+	void remove_player_from_team(Player* player);
+	void update_team_stats(int playerId, int gamesPlayed, int scoredGoals, int cardsReceived);
+	bool is_legitimate_for_match();
+	int get_overall_score();
+	void bump_games_played();
 
-    /**
-     * getters and setters : according to need
-     */
+
+//    Team(int id, int points, Player* top_scorrer = nullptr, int power = ZERO, int games_played = ZERO, bool has_goal_keeper = false);
 
 };
 

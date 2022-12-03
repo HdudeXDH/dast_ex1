@@ -51,7 +51,7 @@ private:
 	void RL_rotate(Node<V,K>* dest);
 	void LR_rotate(Node<V,K>* dest);
 	Node<K,V>* min(Node<K,V>* start);
-	Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
+	Node<K,V>* max_node(Node<K,V>* start = nullptr);
 	void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = true);
 	void swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2);
 	Key_Value_block<K, V>** export_to_array();
@@ -65,14 +65,17 @@ public:
 	AVLTree() : root(nullptr), size(0){};
 	~AVLTree(){ delete root;};
 
-	// methods
+	//basic methods
 	Node<K, V>* search(const K & target_key, bool return_parent= false, Node<K, V> *start_node = nullptr);
 	Node<K,V>* add(const K& key, const V& value );
 	Node<K,V>* remove_by_key(const K& key, Node<K, V> *start_node= nullptr);
-	AVLTree* merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2, bool create_new = true);
-	AVLTree* create_avl_from_array(Key_Value_block<K, V>** array);
+	Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
 	int height() { return get_height(root);};
 	bool is_empty() {return (root == nullptr);}
+
+	// advanced methods
+	AVLTree* merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2, bool create_new = true);
+	AVLTree* create_avl_from_array(Key_Value_block<K, V>** array);
 	class NodeAlreadyExists:public std::exception{};
 	class NodeDoesntExists:public std::exception{};
 
@@ -189,6 +192,17 @@ Node<K,V>* AVLTree<K,V>::min( Node<K,V>* start) {
         start = start->left;
     }
     return start;
+}
+
+template <typename K,typename V>
+Node<K,V>* AVLTree<K,V>::max_node( Node<K,V>* start) {
+	if (start == nullptr) {
+		start = root;
+	}
+	while (start->right != nullptr){
+		start = start->right;
+	}
+	return start;
 }
 
 template <typename K,typename V>

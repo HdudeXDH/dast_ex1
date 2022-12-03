@@ -29,21 +29,23 @@ public:
 
 
 int main() {
-//    test_insertion_deletion();
+    test_insertion_deletion();
 
-    int n=5;
-    bool dummies[n];
-    AVLTree<int,dummy> del_tree;
-    for (int i=0;i<n;i++){
-        del_tree.add(i,dummy(&dummies[i], i));
-    }
-    del_tree.remove_by_key(2);
-    assert (dummies[2]==true);
-    del_tree.add(2,dummy(&dummies[2], 2));
-    for (int i=0;i<n;i++){
-        del_tree.remove_by_key(i);
-        assert (dummies[i]==true);
-    }
+//    int n=5;
+//    bool dummies[n];
+//    AVLTree<int,dummy> del_tree;
+//    for (int i=0;i<n;i++){
+//
+//        del_tree.add(i,dummy(&dummies[i], i));
+//    }
+//    del_tree.remove_by_key(2);
+//    assert (dummies[2]==true);
+//    dummy d(&dummies[2], 2);
+//    del_tree.add(2,d);
+//    for (int i=0;i<n;i++){
+//        del_tree.remove_by_key(i);
+//        assert (dummies[i]==true);
+//    }
 
 
 

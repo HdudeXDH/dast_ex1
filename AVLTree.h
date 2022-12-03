@@ -34,8 +34,8 @@ public:
 	bool has_two_sons();
 	bool is_leaf();
     int BF();
-    bool operator==(const Node& node);
-    bool operator>(const Node& node);
+//    bool operator==(const Node& node);
+//    bool operator>(const Node& node);
     void print();
 };
 
@@ -55,8 +55,8 @@ public:
 	Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
 	void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = true);
 	void swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2);
-	void remove_leaf(Node<K, V> *leaf_to_remove);
-	void remove_link_from_chain(Node<K, V> *node_to_remove);
+    Node<K,V>* remove_leaf(Node<K, V> *leaf_to_remove);
+    Node<K,V>* remove_link_from_chain(Node<K, V> *node_to_remove);
 	void rotate(Node<V,K>* dest);
 	void RR_rotate(Node<V,K>* dest);
 	void LL_rotate(Node<V,K>* dest);
@@ -134,7 +134,7 @@ Node<K,V>*  AVLTree<K,V>::add(const K& key, const V& value ) {
         // insert as is regular Binary tree
         Node<K, V> *new_node = new Node<K, V>(key, value);//std::shared_ptr<Node<K, V>>(new Node<K, V>(key, value), value);
         new_node->parent = search_result;
-        if (search_result > new_node) {
+        if (search_result->key > new_node->key) {
             search_result->left = new_node;
         } else {
             search_result->right = new_node;
@@ -192,10 +192,9 @@ Node<K,V>* AVLTree<K,V>::remove_by_key(const K& key, Node<K, V> *start_node){
     if (target == nullptr){
         throw AVLTree<K,V>::NodeDoesntExists();
     }
-	remove_Node(target, start_node);
+    Node<K,V>* temp = remove_Node(target, start_node);
 	this->size = this->size - 1;
-	/**
-	 *
+
     //AVL_balancing
     if (temp== nullptr){return temp;}
     temp->height=1+max(get_height(temp->left),get_height(temp->right));
@@ -214,12 +213,14 @@ Node<K,V>* AVLTree<K,V>::remove_by_key(const K& key, Node<K, V> *start_node){
             }
             temp = temp->parent;
         }
-    } **/
+    }
     return nullptr;
 }
 
 template <typename K,typename V>
 Node<K,V>* AVLTree<K,V>::remove_Node(Node<K, V> *to_remove, Node<K, V> *start_node) {
+    //todo: node is root?
+    //todo: return?
 	Node<K, V> * follower;
 	bool has_two_sons = to_remove->has_two_sons();
 	// if node is leaf
@@ -227,12 +228,13 @@ Node<K,V>* AVLTree<K,V>::remove_Node(Node<K, V> *to_remove, Node<K, V> *start_no
 		AVLTree::remove_leaf(to_remove);
 	}
 	else if (!has_two_sons) {
-		AVLTree::remove_link_from_chain(to_remove);
+		return AVLTree::remove_link_from_chain(to_remove);
 	} else {
 		follower = AVLTree<K,V>::min(to_remove->right);
-		swap_keys_and_values(to_remove, follower);
-		remove_Node(follower, to_remove->right);
+		swap_keys_and_values(to_remove, follower); //todo: maybe better to use dummy, will be problem in player
+		return remove_Node(follower, to_remove->right);
 	}
+
 }
 
 template<typename K, typename  V>
@@ -247,7 +249,7 @@ void AVLTree<K,V>::swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2) {
 }
 
 template<typename K, typename  V>
-void AVLTree<K,V>::remove_leaf(Node<K, V> *leaf_to_remove){
+Node<K,V>* AVLTree<K,V>::remove_leaf(Node<K, V> *leaf_to_remove){
 	assert(leaf_to_remove->right == nullptr && leaf_to_remove->left == nullptr);
 	Node<K,V> *parent = leaf_to_remove->parent;
 	if (parent->left == leaf_to_remove) {
@@ -257,10 +259,11 @@ void AVLTree<K,V>::remove_leaf(Node<K, V> *leaf_to_remove){
 		parent->right = nullptr;
 	}
 	delete leaf_to_remove;
+    return parent;
 }
 
 template<typename K, typename  V>
-void AVLTree<K,V>::remove_link_from_chain(Node<K, V> *node_to_remove){
+Node<K,V>* AVLTree<K,V>::remove_link_from_chain(Node<K, V> *node_to_remove){
 	assert(!(node_to_remove->is_leaf())&& !(node_to_remove->has_two_sons()));
 	Node<K,V> *son;
 	Node<K,V> *parent = node_to_remove->parent;
@@ -287,6 +290,7 @@ void AVLTree<K,V>::remove_link_from_chain(Node<K, V> *node_to_remove){
 		this->root = son;
 	}
 	delete node_to_remove;
+    return son;
 }
 
 template<typename K, typename  V>
@@ -368,8 +372,10 @@ void AVLTree<K,V>::LL_rotate(Node<V,K>* dest){
     dest->left = T2;
     if (dest==root){
         root=x;
-        root->parent= nullptr;
+//        root->parent= nullptr;
     }
+    x->parent=dest->parent;
+    dest->parent=x;
 
     // Update heights
     dest->height = max(get_height(dest->left),
@@ -390,8 +396,10 @@ void AVLTree<K,V>::RR_rotate(Node<V,K>* dest){
     dest->right = T2;
     if (dest==root){
         root=y;
-        root->parent= nullptr;
+//        root->parent= nullptr;
     }
+    y->parent=dest->parent;
+    dest->parent=y;
 
     // Update heights
     dest->height = max(get_height(dest->left),

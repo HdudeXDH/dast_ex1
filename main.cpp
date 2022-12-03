@@ -13,7 +13,6 @@ int main() {
     a.add(-1,2);
     int ix = 0;
     Key_Value_block<int,int> *array[a.size];
-    a.Recursive_export_to_array(a.root, array, &ix);
     a.add(-1,2);
 
 

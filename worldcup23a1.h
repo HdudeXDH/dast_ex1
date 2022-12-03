@@ -21,11 +21,13 @@
 #include "Team.h"
 
 typedef int Team_id;
+typedef int Player_id;
 class world_cup_t {
 private:
 	// members
-	AVLTree<Player, Player> players;
-	AVLTree<Team_id ,Team> teams;
+	AVLTree<Player_id, Player*> players_by_id;
+	AVLTree<PlayerLevel*, Player*> players_by_level;
+	AVLTree<Team_id ,Team*> teams;
 	Player* top_scorrer;
 	
 public:

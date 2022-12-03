@@ -42,32 +42,37 @@ public:
 
 template <typename K,typename V>
 class AVLTree {
-public:
-	// members
-    Node<K, V> * root;
-	int size;
-	//methods
-	AVLTree() : root(nullptr), size(0){};
-	~AVLTree(){ delete root;};
-	Node<K, V>* search(const K & target_key, bool return_parent= false, Node<K, V> *start_node = nullptr);
-	Node<K,V>* add(const K& key, const V& value );
-	Node<K,V>* remove_by_key(const K& key, Node<K, V> *start_node= nullptr);
-	Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
-	void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = true);
-	void swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2);
-    Node<K,V>* remove_leaf(Node<K, V> *leaf_to_remove);
-    Node<K,V>* remove_link_from_chain(Node<K, V> *node_to_remove);
+private:
+	Node<K,V>* remove_leaf(Node<K, V> *leaf_to_remove);
+	Node<K,V>* remove_link_from_chain(Node<K, V> *node_to_remove);
 	void rotate(Node<V,K>* dest);
 	void RR_rotate(Node<V,K>* dest);
 	void LL_rotate(Node<V,K>* dest);
 	void RL_rotate(Node<V,K>* dest);
 	void LR_rotate(Node<V,K>* dest);
 	Node<K,V>* min(Node<K,V>* start);
+	Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
+	void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = true);
+	void swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2);
 	Key_Value_block<K, V>** export_to_array();
 	void Recursive_export_to_array(Node<K,V>* root, Key_Value_block<K,V> **array, int *indexPtr);
+
+public:
+	// members
+    Node<K, V> * root;
+	int size;
+	// constructor and destractor
+	AVLTree() : root(nullptr), size(0){};
+	~AVLTree(){ delete root;};
+
+	// methods
+	Node<K, V>* search(const K & target_key, bool return_parent= false, Node<K, V> *start_node = nullptr);
+	Node<K,V>* add(const K& key, const V& value );
+	Node<K,V>* remove_by_key(const K& key, Node<K, V> *start_node= nullptr);
 	AVLTree* merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2, bool create_new = true);
 	AVLTree* create_avl_from_array(Key_Value_block<K, V>** array);
 	int height() { return get_height(root);};
+	bool is_empty() {return (root == nullptr);}
 	class NodeAlreadyExists:public std::exception{};
 	class NodeDoesntExists:public std::exception{};
 

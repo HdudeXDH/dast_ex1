@@ -11,6 +11,15 @@ int max(int a, int b){
 }
 
 template <typename K, typename V>
+class Key_Value_block {
+public:
+	K key ;
+	V value ;
+	Key_Value_block(const K& key, const V& value): key(key), value(value){};
+	void merge_arrays(Key_Value_block<K, V>** src1, int size1, Key_Value_block<K, V>** src2, int size2, Key_Value_block<K, V>** dst);
+};
+
+template <typename K, typename V>
 class Node {
 public:
     K key;
@@ -34,13 +43,16 @@ public:
 template <typename K,typename V>
 class AVLTree {
 public:
+	// members
     Node<K, V> * root;
-	AVLTree() : root(nullptr){};
+	int size;
+	//methods
+	AVLTree() : root(nullptr), size(0){};
 	~AVLTree(){ delete root;};
 	Node<K, V>* search(const K & target_key, bool return_parent= false, Node<K, V> *start_node = nullptr);
-	virtual Node<K,V>* add(const K& key, const V& value );
-	virtual Node<K,V>* remove_by_key(const K& key, Node<K, V> *start_node= nullptr);
-	virtual Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
+	Node<K,V>* add(const K& key, const V& value );
+	Node<K,V>* remove_by_key(const K& key, Node<K, V> *start_node= nullptr);
+	Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
 	void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = true);
 	void swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2);
 	void remove_leaf(Node<K, V> *leaf_to_remove);
@@ -51,9 +63,14 @@ public:
 	void RL_rotate(Node<V,K>* dest);
 	void LR_rotate(Node<V,K>* dest);
 	Node<K,V>* min(Node<K,V>* start);
+	Key_Value_block<K, V>** export_to_array();
+	void Recursive_export_to_array(Node<K,V>* root, Key_Value_block<K,V> **array, int *indexPtr);
+	AVLTree* merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2, bool create_new = true);
+	AVLTree* create_avl_from_array(Key_Value_block<K, V>** array);
 	int height() { return get_height(root);};
 	class NodeAlreadyExists:public std::exception{};
 	class NodeDoesntExists:public std::exception{};
+
 
 //	bool friend operator>(const Node<K, V> & first, const Node<K, V> & second);
 };
@@ -101,11 +118,13 @@ template <typename K,typename V>
 // todo Alon - dont we want here v* value instead of const V& value ?
 Node<K,V>*  AVLTree<K,V>::add(const K& key, const V& value ) {
     Node<K, V> *search_result = search(key, true);
+	int size = this->size;
 
-    // key doesn't exist - set the Node to the root of the tree
-    if (search_result == nullptr) {
-        Node<K, V> *new_node = new Node<K, V>(key, value);//std::shared_ptr<Node<K, V>>(new Node<K, V>(key, value));
-        this->root = new_node;
+	// key doesn't exist - set the Node to the root of the tree
+	if (search_result == nullptr) {
+		Node<K, V> *new_node = new Node<K, V>(key, value);//std::shared_ptr<Node<K, V>>(new Node<K, V>(key, value));
+		this->root = new_node;
+		this->size = size + 1;
         return new_node;
     } else {
         // key exists
@@ -120,12 +139,14 @@ Node<K,V>*  AVLTree<K,V>::add(const K& key, const V& value ) {
         } else {
             search_result->right = new_node;
         }
+		this->size = size + 1;
         // AvlTree stuff
         Node<K, V>* temp_node = new_node;
         while(temp_node != root) {
             Node<K, V>* p = temp_node->parent;
             // if the tree is AVL balanced
-            if (get_height(p) >= get_height(temp_node)+1){
+			int temp_node_height = get_height(temp_node);
+            if (get_height(p) >= (temp_node_height+1)){
                 return new_node;
             } else {
                 // check if rotation needed
@@ -172,6 +193,7 @@ Node<K,V>* AVLTree<K,V>::remove_by_key(const K& key, Node<K, V> *start_node){
         throw AVLTree<K,V>::NodeDoesntExists();
     }
 	remove_Node(target, start_node);
+	this->size = this->size - 1;
 	/**
 	 *
     //AVL_balancing
@@ -387,16 +409,82 @@ void AVLTree<K,V>::RL_rotate(Node<V,K>* dest){
 
 template <typename K,typename V>
 void AVLTree<K,V>::LR_rotate(Node<V,K>* dest){
-    RR_rotate(dest);
-    LL_rotate(dest->parent);
+	RR_rotate(dest);
+	LL_rotate(dest->parent);
 };
 
+template <typename K,typename V>
+Key_Value_block<K, V>** AVLTree<K,V>::export_to_array() {
+	int size = this->size;
+	Key_Value_block<K,V>** array = new Key_Value_block<K,V>*[size];
+	// in order organize to array
+	int index = 0;
+	Recursive_export_to_array(root, array, &index);
+	return array;
 
+};
+template <typename K,typename V>
+void AVLTree<K,V>::Recursive_export_to_array(Node<K,V>* root, Key_Value_block<K,V> **array, int *indexPtr){
+	// recursion Base
+	if(root->is_leaf()) {
+		array[*indexPtr] = new Key_Value_block<K, V>(root->key, root->value);
+		(*indexPtr)++;
+		return ;
+	}
+	// handle right subtree
+	if (root->left != nullptr) {
+		Recursive_export_to_array(root->left , array, indexPtr);
+	}
+
+	// add root
+	array[*indexPtr] = new Key_Value_block<K, V>(root->key, root->value);
+	(*indexPtr)++;
+
+	// handle left subtree
+	if (root->right != nullptr) {
+		Recursive_export_to_array(root->right , array, indexPtr);
+	}
+}
+
+template <typename K,typename V>
+AVLTree<K,V>* AVLTree<K,V>::merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2, bool create_new) {
+	int tree1_size = tree1.size, tree2_size = tree2.size;
+	Key_Value_block<K, V>** tree1_array = tree1->export_to_array();
+	Key_Value_block<K, V>** tree2_array = tree2->export_to_array();
+	Key_Value_block<K, V>** merged_array = new Key_Value_block<K, V>*[tree1_size + tree2_size];
+	Key_Value_block<K, V>::merge_arrays(tree1_array, tree2_array, merged_array);
+	AVLTree* new_tree = create_avl_from_array(merged_array);
+}
 
 /**
  * aids
  */
-//void
+template <typename K,typename V>
+void Key_Value_block<K,V>::merge_arrays(Key_Value_block<K, V>** src1, int size1, Key_Value_block<K, V>** src2,int size2, Key_Value_block<K, V>** dst) {
+	int index1 = 0, index2 = 0;
+	int dst_arr_size = size1 + size2;
+	while (index1 + index2 < dst_arr_size) {
+		if (index1 >= size1) {
+			dst[index1 + index2] = src2[index2];
+			index2++;
+		} else if (index2 >= size2) {
+			dst[index1 + index2] = src1[index1];
+			index1++;
+		} else {
+			Key_Value_block<K, V>* block1 = src1[index1];
+			K key1 = block1->key;
+			Key_Value_block<K, V>* block2 = src2[index2];
+			K key2 = block2->key;
+			if (key1 < key2) {
+				dst[index1 + index2] = src1[index1];
+				index1++;
+			} else {
+				dst[index1 + index2] = src1[index2];
+				index2++;
+			}
+		}
+	}
+}
 
 
 /**

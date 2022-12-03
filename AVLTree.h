@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <exception>
 #include <memory>
+#include <iostream>
 
 int max(int a, int b){
     if (a>b) return a;
@@ -70,12 +71,32 @@ public:
 	Node<K,V>* add(const K& key, const V& value );
 	Node<K,V>* remove_by_key(const K& key, Node<K, V> *start_node= nullptr);
 	Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
+/**<<<<<<< logic1
 	int height() { return get_height(root);};
-	bool is_empty() {return (root == nullptr);}
+	
 
 	// advanced methods
 	AVLTree* merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2, bool create_new = true);
 	AVLTree* create_avl_from_array(Key_Value_block<K, V>** array);
+======= **/
+	void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = true);
+	void swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2);
+    Node<K,V>* remove_leaf(Node<K, V> *leaf_to_remove);
+    bool is_empty() {return (root == nullptr);}
+    Node<K,V>* remove_link_from_chain(Node<K, V> *node_to_remove);
+	void rotate(Node<K,V>* dest);
+	void RR_rotate(Node<K,V>* dest);
+	void LL_rotate(Node<K,V>* dest);
+	void RL_rotate(Node<K,V>* dest);
+	void LR_rotate(Node<K,V>* dest);
+	Node<K,V>* min(Node<K,V>* start);
+	Key_Value_block<K, V>** export_to_array();
+	void Recursive_export_to_array(Node<K,V>* root, Key_Value_block<K,V> **array, int *indexPtr);
+	AVLTree* merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2, bool create_new = true);
+	AVLTree* create_avl_from_array(Key_Value_block<K, V>** array);
+    void update_parent(Node<K, V> *child,Node<K, V> *target);
+	int height() { return get_height(root);};
+//>>>>>>> main
 	class NodeAlreadyExists:public std::exception{};
 	class NodeDoesntExists:public std::exception{};
 
@@ -90,6 +111,19 @@ public:
 /**
  ----------------- AVL implementations ----------------------------
  */
+template <typename K,typename V>
+void AVLTree<K, V>::update_parent(Node<K, V> *child,Node<K, V> *target){
+    if (child->parent== nullptr){
+        return;
+    }
+    if (child->parent->right==child){
+        child->parent->right=target;
+    }
+    else {
+        child->parent->left=target;
+    }
+};
+
 template <typename K,typename V>
 Node<K, V>* AVLTree<K, V>::search(const K & target_key, bool return_parent, Node<K, V> *start_node) {
 	if (start_node == nullptr){
@@ -172,7 +206,7 @@ Node<K,V>*  AVLTree<K,V>::add(const K& key, const V& value ) {
     }
 }
 template <typename K,typename V>
-void AVLTree<K,V>::rotate(Node<V,K>* dest){
+void AVLTree<K,V>::rotate(Node<K,V>* dest){
     int balance = dest->BF();
     if (balance > 1 && dest->left->BF()>=0)
         return LL_rotate(dest);
@@ -381,63 +415,87 @@ bool Node<K, V>::is_leaf() {
 //};
 
 template <typename K,typename V>
-void AVLTree<K,V>::LL_rotate(Node<V,K>* dest){
-    //todo: validate
-    Node<K,V> *x = dest->left;
-    Node<K,V> *T2 = x->right;
-
-    // Perform rotation
-    x->right = dest;
-    dest->left = T2;
-    if (dest==root){
-        root=x;
-//        root->parent= nullptr;
+void AVLTree<K,V>::LL_rotate(Node<K,V>* b){
+//    std::cout<<"LL_rotate ("<<b->key<<")"<<std::endl;
+    Node<K,V> *a = b->left;
+    Node<K,V> *a_r = a->right;
+    Node<K,V> *b_p = b->parent;
+    update_parent(b,a);
+    a->right = b;
+    b->left=a_r;
+    if (a_r!= nullptr){
+        a_r->parent=b;
     }
-    x->parent=dest->parent;
-    dest->parent=x;
+    a->parent=b_p;
+    b->parent=a;
+
+    if (b==root){
+        root=a;
+    }
 
     // Update heights
-    dest->height = max(get_height(dest->left),
-                    get_height(dest->right)) + 1;
-    x->height = max(get_height(x->left),
-                    get_height(x->right)) + 1;
+    a->height = max(get_height(a->left),
+                    get_height(a->right)) + 1;
+    b->height = max(get_height(b->left),
+                    get_height(b->right)) + 1;
 
 //    // Return new root
 //    return x;
 };
 template <typename K,typename V>
-void AVLTree<K,V>::RR_rotate(Node<V,K>* dest){
-    Node<K,V> *y = dest->right;
-    Node<K,V> *T2 = y->left;
-
-    // Perform rotation
-    y->left = dest;
-    dest->right = T2;
-    if (dest==root){
-        root=y;
-//        root->parent= nullptr;
+void AVLTree<K,V>::RR_rotate(Node<K,V>* b){
+//    std::cout<<"RR_rotate ("<<b->key<<")"<<std::endl;
+    Node<K,V> *a = b->right;
+    Node<K,V> *a_l = a->left;
+    Node<K,V> *b_p = b->parent;
+    update_parent(b,a);
+    a->left = b;
+    b->right=a_l;
+    if (a_l!= nullptr){
+        a_l->parent=b;
     }
-    y->parent=dest->parent;
-    dest->parent=y;
+    a->parent=b_p;
+    b->parent=a;
+    if (b==root){
+        root=a;
+    }
 
     // Update heights
-    dest->height = max(get_height(dest->left),
-                    get_height(dest->right)) + 1;
-    y->height = max(get_height(y->left),
-                    get_height(y->right)) + 1;
+    a->height = max(get_height(a->left),
+                    get_height(a->right)) + 1;
+    b->height = max(get_height(b->left),
+                    get_height(b->right)) + 1;
+//    Node<K,V> *y = dest->right;
+//    Node<K,V> *T2 = y->left;
+//
+//    // Perform rotation
+//    y->left = dest;
+//    dest->right = T2;
+//    if (dest==root){
+//        root=y;
+////        root->parent= nullptr;
+//    }
+//    y->parent=dest->parent;
+//    dest->parent=y;
+//
+//    // Update heights
+//    dest->height = max(get_height(dest->left),
+//                    get_height(dest->right)) + 1;
+//    y->height = max(get_height(y->left),
+//                    get_height(y->right)) + 1;
 
 };
 
 template <typename K,typename V>
-void AVLTree<K,V>::RL_rotate(Node<V,K>* dest){
+void AVLTree<K,V>::RL_rotate(Node<K,V>* dest){
+    LL_rotate(dest->right);
+    RR_rotate(dest);
+};
+
+template <typename K,typename V>
+void AVLTree<K,V>::LR_rotate(Node<K,V>* dest){
+    RR_rotate(dest->left);
     LL_rotate(dest);
-    RR_rotate(dest->parent);
-};
-
-template <typename K,typename V>
-void AVLTree<K,V>::LR_rotate(Node<V,K>* dest){
-	RR_rotate(dest);
-	LL_rotate(dest->parent);
 };
 
 template <typename K,typename V>

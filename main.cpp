@@ -7,25 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include "test_maker/test_AVL_insertions_deletions.h"
-class dummy{
-    bool * result;
-    int id;
-public:
-    dummy(bool * res, int id=0):result(res), id(id){
-        std::cout<<"dummy["<<id<<"] Ctor used."<<std::endl;
-        *result = false;}
-    ~dummy(){
-        std::cout<<"~dummy["<<id<<"] Dtor used."<<std::endl;
-        *result=true;
-    }
-    bool operator!=(bool other){ return  *result!=other;}
-    bool operator==(bool other){ return  *result==other;}
-};
-
-
-
-// pass the root node of your binary tree
-
+#include "test_maker/test_AVL_memory_leaks.h"
 
 
 int main() {
@@ -40,20 +22,24 @@ int main() {
 //    int ix = 0;
 //    Key_Value_block<int,int> *array[a.size];
 ////    a.add(-1,2);
+    test_leakage();
+//    std::cout<<res;
 
-
-test_insertion_deletion();
+//test_insertion_deletion();
 
 //    int n=5;
-//    bool dummies[n];
-//    AVLTree<int,dummy> del_tree;
+//    int dummies[n];
+//    int dummies_keys[n];
+//    for (int i=0;i<n;i++){ dummies[i]=0;}
+//    for (int i=0;i<n;i++){ dummies_keys[i]=0;}
+//    AVLTree<dummy,dummy> del_tree;
 //    for (int i=0;i<n;i++){
 //
-//        del_tree.add(i,dummy(&dummies[i], i));
+//        del_tree.add(dummy(&dummies_keys[i], i),dummy(&dummies[i], i));
 //    }
-//    del_tree.remove_by_key(2);
-//    assert (dummies[2]==true);
-//    dummy d(&dummies[2], 2);
+//    del_tree.remove_by_key(dummy(&dummies_keys[2], 2));
+//    assert (dummies[2]==0);
+////    dummy d(&dummies[2], 2);
 //    del_tree.add(2,d);
 //    for (int i=0;i<n;i++){
 //        del_tree.remove_by_key(i);

@@ -12,4 +12,4 @@ include_directories(.)
 #        worldcup23a1.cpp
 #        worldcup23a1.h Player.h Team.h)
 
-add_executable(dast_ex1 main.cpp test_maker/test_AVL_insertions_deletions.h)
+add_executable(dast_ex1 main.cpp test_maker/test_AVL_insertions_deletions.h test_maker/test_AVL_memory_leaks.h)

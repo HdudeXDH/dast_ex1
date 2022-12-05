@@ -2,9 +2,9 @@
 
 world_cup_t::world_cup_t(): top_scorrer(nullptr), players_count(EMPTY_NUM)
 {
-	players_by_id = new AVLTree<Player_id, Player*>();
-	players_by_level = new AVLTree<PlayerLevel, Player*>();
-	teams = new AVLTree<Team_id , Team*>();
+	players_by_id = AVLTree<int, Player*>();//AVLTree<Player_id, Player*>();
+	players_by_level = AVLTree<PlayerLevel, Player*>();
+	teams = AVLTree<int , Team>();//AVLTree<Team_id , Team*>();
 }
 
 world_cup_t::~world_cup_t()
@@ -24,10 +24,10 @@ StatusType world_cup_t::add_team(int teamId, int points)
 //		return StatusType::FAILURE;
 //	}
 	try {
-		Team* new_team = new Team(teamId, points);
-		teams.add(teamId, new_team);
+//		Team* new_team = new
+		teams.add(teamId, Team(teamId, points));
 	}
-	catch (AVLTree<teamId, Team>::NodeAlreadyExists& err) {
+	catch (AVLTree<Team_id, Team>::NodeAlreadyExists& err) {
 		return StatusType::FAILURE;
 	}
 	catch (std::bad_alloc& err){
@@ -41,7 +41,7 @@ StatusType world_cup_t::remove_team(int teamId)
 	if (teamId <= 0) {
 		return StatusType::INVALID_INPUT;
 	}
-	Node<Team_id, Team>* search_result = AVLTree<Team_id, Team>::search(teamId);
+	Node<int, Team>* search_result = teams.search(teamId); //Node<Team_id, Team>* //AVLTree<Team_id, Team>::search(teamId);
 	// todo check what is returned if key doesnt exist
 	if (search_result == nullptr) {
 		// team doens't exists

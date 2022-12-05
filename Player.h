@@ -11,10 +11,10 @@ public:
 	// big 3
 	PlayerLevel(int goals, int cards, int id):goals(goals), cards(cards), id(id){}
 	~PlayerLevel() = default;
-	PlayerLevel(const PlayerLevel&) = delete;
+//	PlayerLevel(const PlayerLevel&) = delete; //todo: noam, player lvl needs a copy ctor, i removed the =delete;
 
 	//compare method overload
-	bool operator>(PlayerLevel* level1, PlayerLevel* level2);
+	bool operator>(const PlayerLevel & otherlevel);//(PlayerLevel* level1, PlayerLevel* level2);
 };
 
 

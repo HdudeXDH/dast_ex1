@@ -2,7 +2,7 @@
 
 world_cup_t::world_cup_t(): top_scorrer(nullptr), players_count(EMPTY_NUM)
 {
-	players_by_id = AVLTree<int, Player*>();//AVLTree<Player_id, Player*>();
+	players_by_id = AVLTree<int, Player>();//AVLTree<Player_id, Player*>();
 	players_by_level = AVLTree<PlayerLevel, Player*>();
 	teams = AVLTree<int , Team>();//AVLTree<Team_id , Team*>();
 }
@@ -48,17 +48,17 @@ StatusType world_cup_t::remove_team(int teamId)
 		return StatusType::FAILURE;
 	}
 	Team* team_to_remove = search_result->value;
-	if (!((team_to_remove-players).is_empty())) {
+	if (!((team_to_remove->players).is_empty())) {
 		// team has players
 		return StatusType::FAILURE;
 	}
 	try {
-		teams.remove_by_key(teamId)
+		teams.remove_by_key(teamId);
 		delete team_to_remove;
 	}
 	// todo check what is the spesific type of the deletion exeption
 	catch (std::exception& err){
-		return StatusType::ERROR_ALLOCATION;
+		return StatusType::ALLOCATION_ERROR; //ERROR_ALLOCATION;
 	}
 }
 
@@ -69,19 +69,19 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 		return StatusType::INVALID_INPUT;
 	}
 	Node<Team_id, Team> *team_search_result = teams.search(teamId);
-	Node<Player_id, Player> *player_search_result = players_by_id.search(playerId);
+    Node<int, Player> *player_search_result = players_by_id.search(playerId); //Node<Player_id, Player>
 	if(team_search_result == nullptr || player_search_result != nullptr ) {
 		return StatusType::FAILURE;
 	}
 	Team *team_to_add_player = team_search_result->value;
 	try {
 		// after discussion - use regular ptrs here
-		Player* new_player = new Player(playerId,team_search_result, gamesPlayed, goals, cards, goalKeeper);
-		players_by_id.add(playerId, new_player);
-		players_by_level.add(new_player->level, new_player);
-		team_to_add_player->add_player_to_team(new_player);
+//		Player* new_player = new Player(playerId,team_search_result, gamesPlayed, goals, cards, goalKeeper);
+        Node<int, Player> *new_player = players_by_id.add(playerId, Player(playerId,&team_search_result->value, gamesPlayed, goals, cards, goalKeeper));
+		players_by_level.add(*new_player->value.level, &new_player->value);
+		team_to_add_player->add_player_to_team(&new_player->value);
 		players_count = players_count + 1;
-		top_scorrer = players_by_level.max_node();
+		top_scorrer = players_by_level.max_node()->value;
 	}
 	catch (std::bad_alloc& err){
 		return StatusType::ALLOCATION_ERROR;
@@ -92,25 +92,25 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 StatusType world_cup_t::remove_player(int playerId)
 {
 	if (playerId <= 0) {
-		return StatusType::INVALID_INPUT
+		return StatusType::INVALID_INPUT;
 	}
 	Node<Player_id, Player> *player_node_in_id_tree = players_by_id.search(playerId);
 	if (player_node_in_id_tree == nullptr) {
-		return StatusType::FAILURE
+		return StatusType::FAILURE;
 	}
-	Player *player_to_remove = player_node_in_id_tree->value;
+	Player *player_to_remove = &player_node_in_id_tree->value;
 	Team *players_team = player_to_remove->team;
-	PlayerLevel level = player_to_remove->level;
-	Node<PlayerLevel, Player> *player_node_in_level_tree = players_by_level.search(level);
+	PlayerLevel  level = *player_to_remove->level;
+	Node<PlayerLevel, Player*> *player_node_in_level_tree = players_by_level.search(level);
 	try {
 		// remove player from all AVL trees
 		players_by_id.remove_Node(player_node_in_id_tree);
 		players_by_level.remove_Node(player_node_in_level_tree);
 		players_team->remove_player_from_team(player_to_remove);
-		players_count = players_count - 1
+		players_count = players_count - 1;
 		//delete player
 		delete player_to_remove;
-		top_scorrer = players_by_level.max_node();
+		top_scorrer = players_by_level.max_node()->value;
 	} catch (std::exception& err) {
 		return StatusType::ALLOCATION_ERROR;
 	}

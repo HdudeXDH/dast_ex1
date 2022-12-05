@@ -47,7 +47,7 @@ private:
 	Node<K,V>* remove_leaf(Node<K, V> *leaf_to_remove);
 	Node<K,V>* remove_link_from_chain(Node<K, V> *node_to_remove);
 	Node<K,V>* min(Node<K,V>* start);
-	Node<K,V>* max_node(Node<K,V>* start = nullptr);
+
 	void rotate(Node<K,V>* dest);
 	void RR_rotate(Node<K,V>* dest);
 	void LL_rotate(Node<K,V>* dest);
@@ -71,6 +71,7 @@ public:
 	Node<K,V>* add(const K& key, const V& value );
 	Node<K,V>* remove_by_key(const K& key, Node<K, V> *start_node= nullptr);
 	Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
+    Node<K,V>* max_node(Node<K,V>* start = nullptr);
     bool is_empty() {return (root == nullptr);}
 	AVLTree* merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2, bool create_new = true);
 	AVLTree* create_avl_from_array(Key_Value_block<K, V>** array);

@@ -28,6 +28,7 @@ private:
 	AVLTree<Player_id, Player> players_by_id;
 	AVLTree<PlayerLevel, Player*> players_by_level;
 	AVLTree<Team_id ,Team> teams;
+	AVLTree<Team_id ,Team*> legitimate_teams;
 	Player* top_scorrer;
 	int players_count;
 	

@@ -38,7 +38,10 @@ void Team::remove_player_from_team(Player* player) {
 }
 
 bool Team::is_legitimate_for_match() {
-	if (this->players.size >= MINIMUM_TEAM_SIZE_FOR_MATCH(this->goal_keepers_count > EMPTY_NUM)
+	if (players_count >= MINIMUM_TEAM_SIZE_FOR_MATCH && (goal_keepers_count > EMPTY_NUM) {
+		return true;
+	}
+	return false;
 }
 
 int Team::get_overall_score() {

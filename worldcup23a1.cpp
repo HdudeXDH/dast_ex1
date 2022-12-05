@@ -5,11 +5,15 @@ world_cup_t::world_cup_t(): top_scorrer(nullptr), players_count(EMPTY_NUM)
 	players_by_id = AVLTree<int, Player>();//AVLTree<Player_id, Player*>();
 	players_by_level = AVLTree<PlayerLevel, Player*>();
 	teams = AVLTree<int , Team>();//AVLTree<Team_id , Team*>();
+	legitimate_teams = AVLTree<int, Team*>();
 }
 
 world_cup_t::~world_cup_t()
 {
-
+	delete players_by_level;
+	delete players_by_id;
+	delete legitimate_teams;
+	delete teams;
 	// TODO: Your code goes here
 }
 
@@ -19,10 +23,10 @@ StatusType world_cup_t::add_team(int teamId, int points)
 	if (teamId <= 0 || points < 0) {
 		return StatusType::INVALID_INPUT;
 	}
-//	Node<Team_id, Team> *search_result = teams.search(teamId, true);
-//	if(search_result != nullptr) {
-//		return StatusType::FAILURE;
-//	}
+	Node<Team_id, Team> *search_result = teams.search(teamId, true);
+	if(search_result != nullptr) {
+		return StatusType::FAILURE;
+	}
 	try {
 //		Team* new_team = new
 		teams.add(teamId, Team(teamId, points));
@@ -79,7 +83,11 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 //		Player* new_player = new Player(playerId,team_search_result, gamesPlayed, goals, cards, goalKeeper);
         Node<int, Player> *new_player = players_by_id.add(playerId, Player(playerId,&team_search_result->value, gamesPlayed, goals, cards, goalKeeper));
 		players_by_level.add(*new_player->value.level, &new_player->value);
+		bool was_team_legitimate_before_adding = team_to_add_player->is_legitimate_for_match();
 		team_to_add_player->add_player_to_team(&new_player->value);
+		if (team_to_add_player->is_legitimate_for_match() && !was_team_legitimate_before_adding) {
+			legitimate_teams.add(teamId, team_to_add_player);
+		}
 		players_count = players_count + 1;
 		top_scorrer = players_by_level.max_node()->value;
 	}
@@ -104,10 +112,14 @@ StatusType world_cup_t::remove_player(int playerId)
 	Node<PlayerLevel, Player*> *player_node_in_level_tree = players_by_level.search(level);
 	try {
 		// remove player from all AVL trees
+		bool was_team_legitimate_before_removing = players_team->is_legitimate_for_match();
 		players_by_id.remove_Node(player_node_in_id_tree);
 		players_by_level.remove_Node(player_node_in_level_tree);
 		players_team->remove_player_from_team(player_to_remove);
 		players_count = players_count - 1;
+		if (was_team_legitimate_before_removing && !players_team->is_legitimate_for_match()) {
+			legitimate_teams.remove_by_key(players_team->id);
+		}
 		//delete player
 		delete player_to_remove;
 		top_scorrer = players_by_level.max_node()->value;
@@ -245,10 +257,15 @@ output_t<int> world_cup_t::get_all_players_count(int teamId)
 StatusType world_cup_t::get_all_players(int teamId, int *const output)
 {
 	if (teamId == 0 || output == nullptr) {
-		StatusType::FAILURE;
+		return StatusType::INVALID_INPUT;
 	}
-    output[0] = 4001;
-    output[1] = 4002;
+	if (teamId > 0 ) {
+		Team* team = teams.search(teamId);
+		if (team == nullptr) {
+			return StatusType::FAILURE;
+		}
+		team->players
+	}
 	return StatusType::SUCCESS;
 }
 
@@ -260,7 +277,6 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 
 output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 {
-	// TODO: Your code goes here
-	return 2;
+
 }
 

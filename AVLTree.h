@@ -78,7 +78,7 @@ public:
 	Node<K,V>* add(const K& key, const V& value );
 	Node<K,V>* remove_by_key(const K& key, Node<K, V> *start_node= nullptr);
 	Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
-    Node<K,V>* remove_recursively(Node<K, V>* to_remove);
+//    Node<K,V>* remove_recursively(Node<K, V>* to_remove);
     Node<K,V>* max_node(Node<K,V>* start = nullptr);
     bool is_empty() {return (root == nullptr);}
 	void merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2);
@@ -92,7 +92,7 @@ public:
     Node<K,V>** merge_arrays(Node<K,V> * arr1[], Node<K,V> * arr2[], int m, int n);
 	void Recursive_export_to_array(Node<K,V>* root, Node<K,V> **array, int *indexPtr);
     Node<K,V>* find_next_up(Node<K,V> * start);
-    Node<K,V>* find_next_down(Node<K,V> * start);
+//    Node<K,V>* find_next_down(Node<K,V> * start);
 
 
 //	bool friend operator>(const Node<K, V> & first, const Node<K, V> & second);
@@ -120,7 +120,7 @@ public:
 //};
 template <typename K,typename V>
 Node<K,V>* AVLTree<K, V>::find_next_up(Node<K,V> * start){
-    if (!start->is_leaf()){
+    if (start->right!= nullptr){
         return AVLTree<K, V>::min(start->right);
     }
     Node<K,V>* parent = start->parent;
@@ -130,18 +130,18 @@ Node<K,V>* AVLTree<K, V>::find_next_up(Node<K,V> * start){
     }
     return parent;
 };
-template <typename K,typename V>
-Node<K,V>* AVLTree<K, V>::find_next_down(Node<K,V> * start){
-    if (!start->is_leaf()){
-        return AVLTree<K, V>::max_node(start->left);
-    }
-    Node<K,V>* parent = start->parent;
-    while (parent!= nullptr && start==parent->left){
-        start=parent;
-        parent=parent;
-    }
-    return parent;
-};
+//template <typename K,typename V>
+//Node<K,V>* AVLTree<K, V>::find_next_down(Node<K,V> * start){
+//    if (!start->is_leaf()){
+//        return AVLTree<K, V>::max_node(start->left);
+//    }
+//    Node<K,V>* parent = start->parent;
+//    while (parent!= nullptr && start==parent->left){
+//        start=parent;
+//        parent=parent;
+//    }
+//    return parent;
+//};
 template <typename K,typename V>
 void AVLTree<K, V>::update_parent(Node<K, V> *child,Node<K, V> *target){
     if (child->parent== nullptr){

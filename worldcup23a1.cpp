@@ -10,10 +10,11 @@ world_cup_t::world_cup_t(): top_scorrer(nullptr), players_count(EMPTY_NUM)
 
 world_cup_t::~world_cup_t()
 {
-	delete players_by_level;
-	delete players_by_id;
-	delete legitimate_teams;
-	delete teams;
+//	delete players_by_level;
+//    delete legitimate_teams;
+//    delete teams;
+//    delete players_by_id;
+    // todo: maybe default
 	// TODO: Your code goes here
 }
 
@@ -58,7 +59,7 @@ StatusType world_cup_t::remove_team(int teamId)
 	}
 	try {
 		teams.remove_by_key(teamId);
-		delete team_to_remove;
+//		delete team_to_remove;
 	}
 	// todo check what is the spesific type of the deletion exeption
 	catch (std::exception& err){
@@ -133,28 +134,28 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
                                         int scoredGoals, int cardsReceived)
 {
 	if (playerId <= 0 || gamesPlayed <= 0 || scoredGoals <= 0 || cardsReceived <=0) {
-		retunr StatusType::INVALID_INPUT;
+		return StatusType::INVALID_INPUT;
 	}
 	Node<Player_id, Player> *player_node_in_id_tree = players_by_id.search(playerId);
-	Player player = player_node_in_id_tree->value;
-	Team team = player.team;
-	if (player_node_in_id_tree == nullptr) {
-		return StatusType::FAILURE;
-	}
+    if (player_node_in_id_tree == nullptr) {
+        return StatusType::FAILURE;
+    }
+    Player & player = player_node_in_id_tree->value; //todo: maybe bug, validate
+    Team * team = player.team;
 	try {
-		players_by_level.remove_by_key(player.level);
+		players_by_level.remove_by_key(*player.level);
 	} catch (std::exception& err) {
 		return StatusType::ALLOCATION_ERROR;
 	}
 	// remove (in order to add)
-	team.remove_player_from_team(player);
+	team->remove_player_from_team(&player);
 	player.games_played = (player.games_played + gamesPlayed);
 	player.goals = (player.goals + scoredGoals);
 	player.cards = (player.cards + cardsReceived);
-	player.updateLevel();
+	player.update_level();
 	try {
-		players_by_level.add(player.level, player);
-		team.add_player_to_team(player)
+		players_by_level.add(*player.level, &player);
+		team->add_player_to_team(&player)
 	} catch (std::exception& err) {
 		return StatusType::ALLOCATION_ERROR;
 	}
@@ -166,11 +167,19 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
 	if (teamId1 == teamId2 || teamId1 <= 0 || teamId2 <= 0) {
 		return StatusType::INVALID_INPUT;
 	}
-	Team* team1 = teams.search(teamId1);
-	Team* team2 = teams.search(teamId2);
-	if (team1 == nullptr || team2 == nullptr || !(team1->is_legitimate_for_match()) || !(team2->is_legitimate_for_match())) {
+    Node<int,Team> * team1_node =  teams.search(teamId1);
+    Node<int,Team> * team2_node =  teams.search(teamId2);
+
+	if (team1_node == nullptr || team2_node == nullptr ) {
 		return StatusType::FAILURE;
 	}
+    Team* team1 = team1_node->value;
+    Team* team2 = team2_node->value;
+
+    if (!(team1->is_legitimate_for_match()) || !(team2->is_legitimate_for_match())) {
+        return StatusType::FAILURE;
+    }
+
 	int team1_overall_score = team1->get_overall_score();
 	int team2_overall_score = team2->get_overall_score();
 	if (team1_overall_score == team2_overall_score) {
@@ -189,13 +198,13 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
 output_t<int> world_cup_t::get_num_played_games(int playerId)
 {
 	if (playerId <= 0) {
-		return output_t<int>(StatusType::INVALID_INPUT)
+		return output_t<int>(StatusType::INVALID_INPUT);
 	}
-	Player* player = players_by_id.search(playerId);
-	if (player == nullptr) {
+	Node <int, Player> * player_node = players_by_id.search(playerId);
+	if (player_node == nullptr) {
 		return output_t<int>(StatusType::FAILURE);
 	}
-	int num_of_games = player->get_total_games_played();
+	int num_of_games = player_node->value.get_total_games_played();
 	// todo check syntax correctness
 	return output_t<int>(num_of_games);
 }
@@ -203,19 +212,28 @@ output_t<int> world_cup_t::get_num_played_games(int playerId)
 output_t<int> world_cup_t::get_team_points(int teamId)
 {
 	if (teamId <= 0) {
-		return output_t<int>(StatusType::INVALID_INPUT)
+		return output_t<int>(StatusType::INVALID_INPUT);
 	}
-	Team* team = teams.search(teamId);
-	if (team == nullptr) {
+    Node <int, Team> * team_node = teams.search(teamId);
+
+	if (team_node == nullptr) {
 		return output_t<int>(StatusType::FAILURE);
 	}
-	return output_t<int>(team->points);
+	return output_t<int>(team_node->value.points);
 }
 
 StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 {
-	// TODO fuck my life
 	// TODO: Your code goes here
+    Node <int, Team> * team1_node = teams.search(teamId1);
+    Node <int, Team> * team2_node = teams.search(teamId2);
+    if (team1_node == nullptr || team2_node== nullptr ) {
+        return StatusType::FAILURE;
+    }
+    add_team(newTeamId,team1_node->value.points+team2_node->value.points);
+    Node <int, Team> * newteam_node = teams.search(newTeamId);
+    team1_node->value.
+    merge_trees
 	return StatusType::SUCCESS;
 }
 
@@ -225,11 +243,12 @@ output_t<int> world_cup_t::get_top_scorer(int teamId)
 		return output_t<int>(StatusType::INVALID_INPUT);
 	}
 	if (teamId > 0 ) {
-		Team* team = teams.search(teamId);
-		if (team == nullptr) {
+        Node <int, Team> * team_node = teams.search(teamId);
+//		Team* team = teams.search(teamId);
+		if (team_node == nullptr) {
 			return output_t<int>(StatusType::FAILURE);
 		}
-		return team->top_scorrer->id;
+		return team_node->value.top_scorrer->id;
 	} else {
 		return top_scorrer->id;
 	}
@@ -241,11 +260,12 @@ output_t<int> world_cup_t::get_all_players_count(int teamId)
 		return output_t<int>(StatusType::INVALID_INPUT);
 	}
 	if (teamId > 0 ) {
-		Team* team = teams.search(teamId);
-		if (team == nullptr) {
+        Node <int, Team> * team_node = teams.search(teamId);
+//		Team* team = teams.search(teamId);
+		if (team_node == nullptr) {
 			return output_t<int>(StatusType::FAILURE);
 		}
-		return output_t<int>(team->players_count);
+		return output_t<int>(team_node->value.players_count);
 	} else {
 		return output_t<int>(players_count);
 	}
@@ -256,15 +276,22 @@ output_t<int> world_cup_t::get_all_players_count(int teamId)
 
 StatusType world_cup_t::get_all_players(int teamId, int *const output)
 {
-	if (teamId == 0 || output == nullptr) {
+	//todo: negative values?
+    if (teamId == 0 || output == nullptr) {
 		return StatusType::INVALID_INPUT;
 	}
 	if (teamId > 0 ) {
-		Team* team = teams.search(teamId);
-		if (team == nullptr) {
-			return StatusType::FAILURE;
-		}
-		team->players
+        Node <int, Team> * team_node = teams.search(teamId);
+
+        if (team_node == nullptr) {
+            return StatusType::FAILURE;
+        }
+        Team & team = team_node->value;
+        //todo: validate corrent complexity
+        Key_Value_block<int, Team>** block_array =team.players.export_to_array();
+		for (int i=0; i< team.players_count;i++){
+            output[i] =  block_array[i]->key;
+        }
 	}
 	return StatusType::SUCCESS;
 }

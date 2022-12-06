@@ -12,13 +12,13 @@
 //}
 
 bool PlayerLevel::operator>(const PlayerLevel & otherlevel) {
-	if (this->goals == otherlevel->goals) {
-		if (this->cards == otherlevel->cards) {
-			return (this->id > otherlevel->id);
+	if (this->goals == otherlevel.goals) {
+		if (this->cards == otherlevel.cards) {
+			return (this->id > otherlevel.id);
 		} else
-			return (this->cards < otherlevel->cards);
+			return (this->cards < otherlevel.cards);
 	} else {
-		return (this->goals > otherlevel->goals);
+		return (this->goals > otherlevel.goals);
 	}
 }
 

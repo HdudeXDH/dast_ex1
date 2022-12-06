@@ -45,7 +45,7 @@ public:
     /**
      * getters and setters - add needed
      */
-}
+};
 
 
 #endif //DAST_EX1_PLAYER_H

@@ -17,7 +17,7 @@ public:
 	K key ;
 	V value ;
 	Key_Value_block(const K& key, const V& value): key(key), value(value){};
-	void merge_arrays(Key_Value_block<K, V>** src1, int size1, Key_Value_block<K, V>** src2, int size2, Key_Value_block<K, V>** dst);
+//	void merge_arrays(Key_Value_block<K, V>** src1, int size1, Key_Value_block<K, V>** src2, int size2, Key_Value_block<K, V>** dst);
 };
 
 template <typename K, typename V>
@@ -64,7 +64,11 @@ public:
 	int size;
 	// constructor and destractor
 	AVLTree() : root(nullptr), size(0){};
-	~AVLTree(){ delete root;};
+	~AVLTree(){
+        while (root != nullptr){
+            delete root;  //todo:probarbly bad
+        }
+    };
 
 	//basic methods
 	Node<K, V>* search(const K & target_key, bool return_parent= false, Node<K, V> *start_node = nullptr);
@@ -73,12 +77,15 @@ public:
 	Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
     Node<K,V>* max_node(Node<K,V>* start = nullptr);
     bool is_empty() {return (root == nullptr);}
-	AVLTree* merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2, bool create_new = true);
-	AVLTree* create_avl_from_array(Key_Value_block<K, V>** array);
+	void merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2);
+	void create_avl_from_array(Key_Value_block<K, V>** array, int n);
     void update_parent(Node<K, V> *child,Node<K, V> *target);
+    Node<K,V>* sortedArrayToBST(Key_Value_block<K,V>** arr[], int start, int end,  int height=1);
 	int height() { return get_height(root);};
 	class NodeAlreadyExists:public std::exception{};
 	class NodeDoesntExists:public std::exception{};
+    class AVLTreeNotEmpty:public std::exception{};
+    Key_Value_block<K,V>** merge_arrays(Key_Value_block<K,V> * arr1[], Key_Value_block<K,V> * arr2[], int m, int n);
 	void Recursive_export_to_array(Node<K,V>* root, Key_Value_block<K,V> **array, int *indexPtr);
 
 
@@ -250,6 +257,14 @@ Node<K,V>* AVLTree<K,V>::remove_by_key(const K& key, Node<K, V> *start_node){
     }
     return nullptr;
 }
+
+template <typename K,typename V>
+void AVLTree<K,V>::create_avl_from_array(Key_Value_block<K, V>** array, int n){
+    if (!this->is_empty()){throw AVLTree<K,V>::AVLTreeNotEmpty();}
+    root = sortedArrayToBST(array, 0, n); //todo maybe should be n-1
+    size = n;
+};
+
 
 template <typename K,typename V>
 Node<K,V>* AVLTree<K,V>::remove_Node(Node<K, V> *to_remove, Node<K, V> *start_node) {
@@ -513,44 +528,44 @@ void AVLTree<K,V>::Recursive_export_to_array(Node<K,V>* root, Key_Value_block<K,
 }
 
 template <typename K,typename V>
-AVLTree<K,V>* AVLTree<K,V>::merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2, bool create_new) {
+void AVLTree<K,V>::merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2) {
+    if (!is_empty()) {throw AVLTreeNotEmpty();}
 	int tree1_size = tree1.size, tree2_size = tree2.size;
 	Key_Value_block<K, V>** tree1_array = tree1->export_to_array();
 	Key_Value_block<K, V>** tree2_array = tree2->export_to_array();
-	Key_Value_block<K, V>** merged_array = new Key_Value_block<K, V>*[tree1_size + tree2_size];
-	Key_Value_block<K, V>::merge_arrays(tree1_array, tree2_array, merged_array);
-	AVLTree* new_tree = create_avl_from_array(merged_array);
+	Key_Value_block<K, V>** merged_array = merge_arrays(tree1_array,tree2_array,tree1_size,tree2_size);
+	create_avl_from_array(merged_array);
 }
 
 /**
  * aids
  */
-template <typename K,typename V>
-void Key_Value_block<K,V>::merge_arrays(Key_Value_block<K, V>** src1, int size1, Key_Value_block<K, V>** src2,int size2, Key_Value_block<K, V>** dst) {
-	int index1 = 0, index2 = 0;
-	int dst_arr_size = size1 + size2;
-	while (index1 + index2 < dst_arr_size) {
-		if (index1 >= size1) {
-			dst[index1 + index2] = src2[index2];
-			index2++;
-		} else if (index2 >= size2) {
-			dst[index1 + index2] = src1[index1];
-			index1++;
-		} else {
-			Key_Value_block<K, V>* block1 = src1[index1];
-			K key1 = block1->key;
-			Key_Value_block<K, V>* block2 = src2[index2];
-			K key2 = block2->key;
-			if (key1 < key2) {
-				dst[index1 + index2] = src1[index1];
-				index1++;
-			} else {
-				dst[index1 + index2] = src1[index2];
-				index2++;
-			}
-		}
-	}
-}
+//template <typename K,typename V>
+//void Key_Value_block<K,V>::merge_arrays(Key_Value_block<K, V>** src1, int size1, Key_Value_block<K, V>** src2,int size2, Key_Value_block<K, V>** dst) {
+//	int index1 = 0, index2 = 0;
+//	int dst_arr_size = size1 + size2;
+//	while (index1 + index2 < dst_arr_size) {
+//		if (index1 >= size1) {
+//			dst[index1 + index2] = src2[index2];
+//			index2++;
+//		} else if (index2 >= size2) {
+//			dst[index1 + index2] = src1[index1];
+//			index1++;
+//		} else {
+//			Key_Value_block<K, V>* block1 = src1[index1];
+//			K key1 = block1->key;
+//			Key_Value_block<K, V>* block2 = src2[index2];
+//			K key2 = block2->key;
+//			if (key1 < key2) {
+//				dst[index1 + index2] = src1[index1];
+//				index1++;
+//			} else {
+//				dst[index1 + index2] = src1[index2];
+//				index2++;
+//			}
+//		}
+//	}
+//}
 
 
 /**
@@ -583,4 +598,74 @@ int Node<K,V>::BF() {
 //bool Node<K,V>::operator>(const Node<K,V>& node) {
 //    return node.key>this->key;
 //};
+
+//-----
+//todo: cleanup
+template <typename K, typename V>
+Node<K,V> * AVLTree<K,V>::sortedArrayToBST(Key_Value_block<K,V>** arr[], int start, int end,  int height)
+{
+    /* Base Case */
+    if (start > end)
+        return nullptr;
+
+    /* Get the middle element and make it root */
+    int mid = (start + end)/2;
+//    Node(const K& key, const V& value,,
+    Node<K,V> *root = new Node<K,V>(arr[mid].key, arr[mid].value, height);
+
+    /* Recursively construct the left subtree and make it
+    left child of root */
+    root->left = sortedArrayToBST(arr, start, mid-1,height+1);
+
+    /* Recursively construct the right subtree and make it
+    right child of root */
+    root->right = sortedArrayToBST(arr, mid+1, end,height+1);
+
+    return root;
+}
+
+
+//todo: clean up
+template <typename K, typename V>
+Key_Value_block<K,V>** AVLTree<K,V>::merge_arrays(Key_Value_block<K,V> * arr1[], Key_Value_block<K,V> * arr2[], int m, int n)
+{
+    // mergedArr[] is going to contain result
+    int *mergedArr = new Key_Value_block<K,V>*[m + n];
+    int i = 0, j = 0, k = 0;
+
+    // Traverse through both arrays
+    while (i < m && j < n)
+    {
+        // Pick the smaller element and put it in mergedArr
+        if (arr1[i].key < arr2[j].key)
+        {
+            mergedArr[k] = arr1[i];
+            i++;
+        }
+        else
+        {
+            mergedArr[k] = arr2[j];
+            j++;
+        }
+        k++;
+    }
+
+    // If there are more elements in first array
+    while (i < m)
+    {
+        mergedArr[k] = arr1[i];
+        i++; k++;
+    }
+
+    // If there are more elements in second array
+    while (j < n)
+    {
+        mergedArr[k] = arr2[j];
+        j++; k++;
+    }
+
+    return mergedArr;
+}
+
+
 #endif //DAST_EX1_BINARYTREE_H

@@ -19,6 +19,7 @@
 //#include "AVLTree.h"
 #include "Player.h"
 #include "Team.h"
+#include "LinkedList.h"
 
 typedef int Team_id;
 typedef int Player_id;
@@ -31,6 +32,7 @@ private:
 	AVLTree<Team_id ,Team*> legitimate_teams;
 	Player* top_scorrer;
 	int players_count;
+
 	
 public:
 	// <DO-NOT-MODIFY> {

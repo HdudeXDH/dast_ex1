@@ -83,7 +83,15 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 		// after discussion - use regular ptrs here
 //		Player* new_player = new Player(playerId,team_search_result, gamesPlayed, goals, cards, goalKeeper);
         Node<int, Player> *new_player = players_by_id.add(playerId, Player(playerId,&team_search_result->value, gamesPlayed, goals, cards, goalKeeper));
-		players_by_level.add(*new_player->value.level, &new_player->value);
+        Node<PlayerLevel, Player*> *new_player_by_level = players_by_level.add(*new_player->value.level, &new_player->value);
+        Node<PlayerLevel, Player*> *nextup = players_by_level.find_next_up(new_player_by_level);
+
+        nextup->value->next_down->next_up=new_player_by_level->value; // nextdown.nextup=current
+        new_player_by_level->value->next_down=nextup->value->next_down; // current.nextdown=nextdown
+        nextup->value->next_down=new_player_by_level->value;//nextup.nextdown = current
+        new_player_by_level->value->next_up=nextup->value;//current.nextup=nextup
+
+
 		bool was_team_legitimate_before_adding = team_to_add_player->is_legitimate_for_match();
 		team_to_add_player->add_player_to_team(&new_player->value);
 		if (team_to_add_player->is_legitimate_for_match() && !was_team_legitimate_before_adding) {
@@ -141,6 +149,10 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
         return StatusType::FAILURE;
     }
     Player & player = player_node_in_id_tree->value; //todo: maybe bug, validate
+    //update next_up & next down
+    if (player.next_down != nullptr) {player.next_down->next_up = player.next_up;}
+    if (player.next_up != nullptr) {player.next_up->next_down = player.next_down;}
+
     Team * team = player.team;
 	try {
 		players_by_level.remove_by_key(*player.level);
@@ -155,7 +167,7 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 	player.update_level();
 	try {
 		players_by_level.add(*player.level, &player);
-		team->add_player_to_team(&player)
+		team->add_player_to_team(&player);
 	} catch (std::exception& err) {
 		return StatusType::ALLOCATION_ERROR;
 	}
@@ -224,7 +236,7 @@ output_t<int> world_cup_t::get_team_points(int teamId)
 
 StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 {
-	// TODO: Your code goes here
+
     Node <int, Team> * team1_node = teams.search(teamId1);
     Node <int, Team> * team2_node = teams.search(teamId2);
     if (team1_node == nullptr || team2_node== nullptr ) {
@@ -232,8 +244,15 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     }
     add_team(newTeamId,team1_node->value.points+team2_node->value.points);
     Node <int, Team> * newteam_node = teams.search(newTeamId);
-    team1_node->value.
-    merge_trees
+    Team & newteam = newteam_node->value;
+    Team & team1 = team1_node->value;
+    Team & team2 = team2_node->value;
+    newteam.players.merge_trees(team1.players,team2.players);
+    newteam.players_count = team1.players_count + team2.players_count;
+    newteam.goal_keepers_count = team1.goal_keepers_count + team2.goal_keepers_count;
+    newteam.power = team1.power + team2.power; //todo: check that its correct!!
+    if (*team1.top_scorrer->level>*team2.top_scorrer->level) {newteam.top_scorrer= team1.top_scorrer;}
+    else {newteam.top_scorrer= team2.top_scorrer;}
 	return StatusType::SUCCESS;
 }
 
@@ -288,9 +307,9 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
         }
         Team & team = team_node->value;
         //todo: validate corrent complexity
-        Key_Value_block<int, Team>** block_array =team.players.export_to_array();
+        Node<int, Team>** block_array =team.players.export_to_array();
 		for (int i=0; i< team.players_count;i++){
-            output[i] =  block_array[i]->key;
+            output[i] =  block_array[i]->value;
         }
 	}
 	return StatusType::SUCCESS;
@@ -299,11 +318,15 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
 output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 {
 	// TODO: Your code goes here
-	return 1006;
+    Node <int, Team> * team_node = teams.search(teamId);
+    Node <int, Player*> * player_node = team_node->value->players.search(playerId);
+	return player_node->value->getCloset()->id;
 }
 
 output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 {
-
+    // if num players < num teams, get player list, and
+    //todo: create "valid" teams
+    teams.Recursive_export_to_array()
 }
 

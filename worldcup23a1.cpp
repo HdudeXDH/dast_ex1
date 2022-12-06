@@ -327,6 +327,6 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 {
     // if num players < num teams, get player list, and
     //todo: create "valid" teams
-    teams.Recursive_export_to_array()
+    //teams.Recursive_export_to_array()
 }
 

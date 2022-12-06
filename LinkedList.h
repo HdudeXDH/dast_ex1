@@ -16,7 +16,7 @@ public:
 
 
 	// Ctor & Dtor
-	LinkedList_Node();
+	LinkedList_Node() = default;
 	LinkedList_Node(K key,V value): key(key), value(value){};
 
 	// methods :
@@ -28,14 +28,13 @@ template <typename K, typename V>
 class LinkedList {
 public:
 	// members
+	// Head is dummy, does not have a value
 	LinkedList_Node<K,V>* head;
 	LinkedList_Node<K,V>* tail;
 	int size;
 
 	// Ctor & Dtor
-	LinkedList(): size(0) {
-		head = LinkedList_Node<K,V>();
-		tail = head;
+	LinkedList(): size(0), head(new LinkedList_Node<K,V>()), tail(head) {
 		head->prev = nullptr;
 		tail->next = nullptr;
 	};
@@ -48,7 +47,7 @@ public:
 
 template <typename K, typename V>
 void LinkedList<K,V>::add(K key, V value) {
-	LinkedList_Node<K,V>* new_node = LinkedList_Node<K,V>(key, value);
+	LinkedList_Node<K,V>* new_node = new LinkedList_Node<K,V>(key, value);
 	new_node->prev = tail;
 	tail->next = new_node;
 	tail = new_node;
@@ -56,7 +55,7 @@ void LinkedList<K,V>::add(K key, V value) {
 }
 template <typename K, typename V>
 bool LinkedList<K,V>::remove_node(LinkedList_Node<K,V>* to_remove) {
-	if (size == 1) {
+	if (size == 1 || to_remove == head) {
 		return false;
 	}
 	if (to_remove == head) {
@@ -71,6 +70,7 @@ bool LinkedList<K,V>::remove_node(LinkedList_Node<K,V>* to_remove) {
 		before->next = after;
 		after->prev = before;
 	}
+	size--;
 	delete to_remove;
 	return true;
 }

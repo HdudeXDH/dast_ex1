@@ -14,6 +14,7 @@
 
 #ifndef WORLDCUP23A1_H_
 #define WORLDCUP23A1_H_
+#define POINTS_TO_ADD 3
 
 #include "wet1util.h"
 //#include "AVLTree.h"
@@ -33,6 +34,9 @@ private:
 	Player* top_scorrer;
 	int players_count;
 
+	// methods
+	LinkedList<int, int>* export_lagitimate_teams_to_list(int minTeamId, int maxTeamId);
+	void recursive_export_to_list(int minTeamId, int maxTeamId, Node<int, Team*>* start, LinkedList<int, int>* list);
 	
 public:
 	// <DO-NOT-MODIFY> {

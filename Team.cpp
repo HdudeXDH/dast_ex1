@@ -53,6 +53,10 @@ int Team::get_overall_score() {
 void Team::bump_games_played() {
 	this->games_played = this->games_played + 1;
 }
+
+int Player::get_total_games_played() {
+    return (team->games_played + games_played);
+}
 //void Team::update_team_stats(int playerId, int gamesPlayed, int scoredGoals, int cardsReceived) {
 //
 //	Node<PlayerLevel, Player> *new_top_scorrer = players.max_node();

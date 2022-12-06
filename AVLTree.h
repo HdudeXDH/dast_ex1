@@ -5,11 +5,8 @@
 #include <exception>
 #include <memory>
 #include <iostream>
-
-int max(int a, int b){
-    if (a>b) return a;
-    else return b;
-}
+//#include "Utils.h"
+#define max(X, Y) (((X) > (Y)) ? (X) : (Y))
 
 //template <typename K, typename V>
 //class Node {
@@ -85,12 +82,12 @@ public:
 	void merge_trees(AVLTree<K,V> & tree1, AVLTree<K,V> &tree2);
 	void create_avl_from_array(Node<K, V>** array, int n);
     void update_parent(Node<K, V> *child,Node<K, V> *target);
-    Node<K,V>* sortedArrayToBST(Node<K,V>** arr[], int start, int end, int height=1);
+    Node<K,V>* sortedArrayToBST(Node<K,V>* arr[], int start, int end, int height=1);
 	int height() { return get_height(root);};
 	class NodeAlreadyExists:public std::exception{};
 	class NodeDoesntExists:public std::exception{};
     class AVLTreeNotEmpty:public std::exception{};
-    Node<K,V>** merge_arrays(Node<K,V> * arr1[], Node<K,V> * arr2[], int m, int n);
+    Node<K,V>** merge_arrays(Node<K,V> * arr1[], Node<K,V> * arr2[], int m, int n, Node<K,V> * mergedArr[]);
 	void Recursive_export_to_array(Node<K,V>* root, Node<K,V> **array, int *indexPtr);
     Node<K,V>* find_next_up(Node<K,V> * start);
 //    Node<K,V>* find_next_down(Node<K,V> * start);
@@ -190,7 +187,7 @@ Node<K, V>* AVLTree<K, V>::search(const K & target_key, bool return_parent, Node
 
 template <typename K,typename V>
 // todo Alon - dont we want here v* value instead of const V& value ?
-Node<K,V>*  AVLTree<K,V>::add(const K& key, const V& value ) {
+Node<K,V>*  AVLTree<K,V>::add(const K& key, const V& value ) {//(const K& key, const V& value ) {
     Node<K, V> *search_result = search(key, true);
 	int size = this->size;
 
@@ -577,7 +574,8 @@ void AVLTree<K,V>::merge_trees(AVLTree<K,V> & tree1, AVLTree<K,V> & tree2) {
 	int tree1_size = tree1.size, tree2_size = tree2.size;
 	Node<K, V>** tree1_array = tree1.export_to_array();
 	Node<K, V>** tree2_array = tree2.export_to_array();
-	Node<K, V>** merged_array = merge_arrays(tree1_array, tree2_array, tree1_size, tree2_size);
+    Node<K,V>* mergedArr[tree1.size + tree2.size];
+	Node<K, V>** merged_array = merge_arrays(tree1_array, tree2_array, tree1_size, tree2_size,mergedArr);
 	create_avl_from_array(merged_array,tree1_size+tree2_size);
 }
 
@@ -646,7 +644,7 @@ int Node<K,V>::BF() {
 //-----
 //todo: cleanup
 template <typename K, typename V>
-Node<K,V> * AVLTree<K,V>::sortedArrayToBST(Node<K,V>** arr[], int start, int end, int height)
+Node<K,V> * AVLTree<K,V>::sortedArrayToBST(Node<K,V>* arr[], int start, int end, int height)
 {
     /* Base Case */
     if (start > end)
@@ -672,17 +670,18 @@ Node<K,V> * AVLTree<K,V>::sortedArrayToBST(Node<K,V>** arr[], int start, int end
 
 //todo: clean up
 template <typename K, typename V>
-Node<K,V>** AVLTree<K,V>::merge_arrays(Node<K,V> * arr1[], Node<K,V> * arr2[], int m, int n)
+Node<K,V>** AVLTree<K,V>::merge_arrays(Node<K,V> * arr1[], Node<K,V> * arr2[], int m, int n, Node<K,V> * mergedArr[])
 {
     // mergedArr[] is going to contain result
-    int *mergedArr = new Node<K,V>*[m + n];
+
+//    Node<K,V>* mergedArr[m + n];
     int i = 0, j = 0, k = 0;
 
     // Traverse through both arrays
     while (i < m && j < n)
     {
         // Pick the smaller element and put it in mergedArr
-        if (arr1[i].key < arr2[j].key)
+        if (arr2[i]->key > arr1[j]->key)
         {
             mergedArr[k] = arr1[i];
             i++;

@@ -12,7 +12,7 @@
 //    void printTree(AVLTree<K, V>* tree);
 //};
 
-
+//
 void printBT(const std::string& prefix, const Node<int,int> * node, bool isLeft)
 {
     if( node != nullptr )
@@ -47,5 +47,10 @@ void printBT(const Node<int,int> * node)
 {
     printBT("", node, false);
 }
+
+//int max(int a, int b){
+//    if (a>b) return a;
+//    else return b;
+//}
 
 #endif //DAST_EX1_UTILS_H

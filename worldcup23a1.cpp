@@ -65,6 +65,7 @@ StatusType world_cup_t::remove_team(int teamId)
 	catch (std::exception& err){
 		return StatusType::ALLOCATION_ERROR; //ERROR_ALLOCATION;
 	}
+    return StatusType::SUCCESS;
 }
 
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
@@ -130,7 +131,7 @@ StatusType world_cup_t::remove_player(int playerId)
 			legitimate_teams.remove_by_key(players_team->id);
 		}
 		//delete player
-		delete player_to_remove;
+//		delete player_to_remove;
 		top_scorrer = players_by_level.max_node()->value;
 	} catch (std::exception& err) {
 		return StatusType::ALLOCATION_ERROR;
@@ -338,5 +339,6 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
     // if num players < num teams, get player list, and
     //todo: create "valid" teams
     //teams.Recursive_export_to_array()
+    return 0;
 }
 

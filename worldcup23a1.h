@@ -16,7 +16,7 @@
 #define WORLDCUP23A1_H_
 
 #include "wet1util.h"
-#include "AVLTree.h"
+//#include "AVLTree.h"
 #include "Player.h"
 #include "Team.h"
 

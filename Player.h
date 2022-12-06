@@ -14,6 +14,8 @@ public:
 	~PlayerLevel() = default;
 	//compare method overload
 	bool operator>(const PlayerLevel & otherlevel);//(PlayerLevel* level1, PlayerLevel* level2);
+    bool operator==(const PlayerLevel & otherlevel);
+    bool operator<(const PlayerLevel & otherlevel);
 };
 
 

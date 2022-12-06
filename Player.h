@@ -1,7 +1,8 @@
 #ifndef DAST_EX1_PLAYER_H
 #define DAST_EX1_PLAYER_H
-#include "Team.h"
+//#include "Team.h"
 
+class Team;
 class PlayerLevel {
 public:
 	int goals;
@@ -11,19 +12,17 @@ public:
 	// big 3
 	PlayerLevel(int goals, int cards, int id):goals(goals), cards(cards), id(id){}
 	~PlayerLevel() = default;
-//	PlayerLevel(const PlayerLevel&) = delete; //todo: noam, player lvl needs a copy ctor, i removed the =delete;
-
 	//compare method overload
 	bool operator>(const PlayerLevel & otherlevel);//(PlayerLevel* level1, PlayerLevel* level2);
 };
 
 
 class Player {
-
 public:
 	// used to be private:
 	int id;
-	Team* team;
+//	Team* team;
+    Team* team;
 	PlayerLevel* level;
 	int cards;
 	int games_played;

@@ -55,7 +55,7 @@ private:
 	void LR_rotate(Node<K,V>* dest);
 	void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = true);
 	void swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2);
-	Node<K, V>** export_to_array();
+
 
 
 public:
@@ -80,8 +80,9 @@ public:
 	Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
 //    Node<K,V>* remove_recursively(Node<K, V>* to_remove);
     Node<K,V>* max_node(Node<K,V>* start = nullptr);
+    Node<K, V>** export_to_array();
     bool is_empty() {return (root == nullptr);}
-	void merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2);
+	void merge_trees(AVLTree<K,V> & tree1, AVLTree<K,V> &tree2);
 	void create_avl_from_array(Node<K, V>** array, int n);
     void update_parent(Node<K, V> *child,Node<K, V> *target);
     Node<K,V>* sortedArrayToBST(Node<K,V>** arr[], int start, int end, int height=1);
@@ -571,13 +572,13 @@ void AVLTree<K,V>::Recursive_export_to_array(Node<K,V>* root, Node<K,V> **array,
 }
 
 template <typename K,typename V>
-void AVLTree<K,V>::merge_trees(AVLTree<K,V> tree1, AVLTree<K,V> tree2) {
+void AVLTree<K,V>::merge_trees(AVLTree<K,V> & tree1, AVLTree<K,V> & tree2) {
     if (!is_empty()) {throw AVLTreeNotEmpty();}
 	int tree1_size = tree1.size, tree2_size = tree2.size;
-	Node<K, V>** tree1_array = tree1->export_to_array();
-	Node<K, V>** tree2_array = tree2->export_to_array();
+	Node<K, V>** tree1_array = tree1.export_to_array();
+	Node<K, V>** tree2_array = tree2.export_to_array();
 	Node<K, V>** merged_array = merge_arrays(tree1_array, tree2_array, tree1_size, tree2_size);
-	create_avl_from_array(merged_array);
+	create_avl_from_array(merged_array,tree1_size+tree2_size);
 }
 
 /**

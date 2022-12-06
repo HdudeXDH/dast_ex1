@@ -52,7 +52,7 @@ StatusType world_cup_t::remove_team(int teamId)
 		// team doens't exists
 		return StatusType::FAILURE;
 	}
-	Team* team_to_remove = search_result->value;
+	Team* team_to_remove = &search_result->value;
 	if (!((team_to_remove->players).is_empty())) {
 		// team has players
 		return StatusType::FAILURE;
@@ -78,7 +78,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 	if(team_search_result == nullptr || player_search_result != nullptr ) {
 		return StatusType::FAILURE;
 	}
-	Team *team_to_add_player = team_search_result->value;
+	Team *team_to_add_player = &team_search_result->value;
 	try {
 		// after discussion - use regular ptrs here
 //		Player* new_player = new Player(playerId,team_search_result, gamesPlayed, goals, cards, goalKeeper);
@@ -185,8 +185,8 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
 	if (team1_node == nullptr || team2_node == nullptr ) {
 		return StatusType::FAILURE;
 	}
-    Team* team1 = team1_node->value;
-    Team* team2 = team2_node->value;
+    Team* team1 = &team1_node->value;
+    Team* team2 = &team2_node->value;
 
     if (!(team1->is_legitimate_for_match()) || !(team2->is_legitimate_for_match())) {
         return StatusType::FAILURE;
@@ -247,6 +247,16 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     Team & newteam = newteam_node->value;
     Team & team1 = team1_node->value;
     Team & team2 = team2_node->value;
+    //todo: update all players
+    Node<PlayerLevel, Player*>** team1_array = team1.players.export_to_array();
+    for (int i=0;i<team1.players_count;i++){
+        team1_array[i]->value->games_played+=team1.games_played-team1_array[i]->value->teams_matches_pre_arrival_count;
+    }
+    Node<PlayerLevel, Player*>** team2_array = team2.players.export_to_array();
+    for (int i=0;i<team2.players_count;i++){
+        team2_array[i]->value->games_played+=team2.games_played-team2_array[i]->value->teams_matches_pre_arrival_count;
+    }
+    //merging the trees
     newteam.players.merge_trees(team1.players,team2.players);
     newteam.players_count = team1.players_count + team2.players_count;
     newteam.goal_keepers_count = team1.goal_keepers_count + team2.goal_keepers_count;
@@ -307,9 +317,9 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
         }
         Team & team = team_node->value;
         //todo: validate corrent complexity
-        Node<int, Team>** block_array =team.players.export_to_array();
+        Node<PlayerLevel, Player*>** block_array =team.players.export_to_array();
 		for (int i=0; i< team.players_count;i++){
-            output[i] =  block_array[i]->value;
+            output[i] =  block_array[i]->value->id;
         }
 	}
 	return StatusType::SUCCESS;
@@ -319,7 +329,7 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 {
 	// TODO: Your code goes here
     Node <int, Team> * team_node = teams.search(teamId);
-    Node <int, Player*> * player_node = team_node->value->players.search(playerId);
+    Node <int, Player*> * player_node = team_node->value.players_by_id.search(playerId);
 	return player_node->value->getCloset()->id;
 }
 

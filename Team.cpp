@@ -11,6 +11,7 @@ Team::Team(int id, int points): id(id), points(points), top_scorrer(nullptr), pl
 void Team::add_player_to_team(Player* player) {
 	assert(player != nullptr);
 	players.add(*player->level, player);
+    players_by_id.add(player->id, player);
 	players_count = players_count + 1;
 	if (player->is_goal_keeper) {
 		this->goal_keepers_count = ((this->goal_keepers_count) + 1);
@@ -25,6 +26,7 @@ void Team::add_player_to_team(Player* player) {
 void Team::remove_player_from_team(Player* player) {
 	assert(player != nullptr);
 	players.remove_by_key(*player->level);
+    players_by_id.remove_by_key(player->id);
 	players_count = players_count - 1;
 	if (player->is_goal_keeper) {
 		this->goal_keepers_count = ((this->goal_keepers_count) - 1);

@@ -2,8 +2,7 @@
 #define DAST_EX1_TEAM_H
 #include "AVLTree.h"
 #include "Player.h"
-#include "Team.h"
-
+//#include "Team.h"
 #define EMPTY_NUM 0
 #define ZERO 0
 #define MINIMUM_TEAM_SIZE_FOR_MATCH 11
@@ -11,12 +10,12 @@
 
 class Team {
 private:
-
 public:
 	// members
 	int id;
 	int points;
 	AVLTree<PlayerLevel, Player*> players;
+    AVLTree<int, Player*> players_by_id;
 	Player* top_scorrer;
 	int players_count;
 	int goal_keepers_count;

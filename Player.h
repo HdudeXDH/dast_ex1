@@ -30,8 +30,8 @@ public:
 	bool is_goal_keeper;
 	int goals;
 	int teams_matches_pre_arrival_count;
-	Node<int, Player>* next_up;
-	Node<int, Player>* next_down;
+    Player* next_up;
+    Player* next_down;
 
 
 	Player()= delete;
@@ -40,6 +40,30 @@ public:
 	void update_level();
     bool operator> (const Player& other) const;
 	int get_total_games_played();
+    Player * getCloset(){
+        if (next_up== nullptr){return next_down;}
+        if (next_down== nullptr){return next_up;}
+        if (next_down->goals!=next_up->goals) {
+            int downDelta = goals-next_down->goals;
+            int upDelta = goals-next_down->goals;
+            if (downDelta*downDelta<upDelta*upDelta) return next_down;
+            else return next_up;
+        }
+        if (next_down->cards!=next_up->cards) {
+            int downDelta = cards-next_down->cards;
+            int upDelta = cards-next_down->cards;
+            if (downDelta*downDelta<upDelta*upDelta) return next_down;
+            else return next_up;
+        }
+        if (next_down->id!=next_up->id) {
+            int downDelta = id-next_down->id;
+            int upDelta = id-next_down->id;
+            if (downDelta*downDelta<upDelta*upDelta) return next_down;
+            else return next_up;
+        }
+        if (next_down->id>next_up->id) return next_down;
+        else return next_up;
+    }
 
 
     /**

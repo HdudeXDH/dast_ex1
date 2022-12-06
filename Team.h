@@ -2,11 +2,13 @@
 #define DAST_EX1_TEAM_H
 #include "AVLTree.h"
 #include "Player.h"
+#include "Team.h"
+
 #define EMPTY_NUM 0
 #define ZERO 0
 #define MINIMUM_TEAM_SIZE_FOR_MATCH 11
 
-class Player;
+
 class Team {
 private:
 

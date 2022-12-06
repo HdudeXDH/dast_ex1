@@ -335,8 +335,60 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 
 output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 {
+	if (minTeamId <= 0 || maxTeamId <= 0 || minTeamId > maxTeamId) {
+		return output_t<int>(StatusType::INVALID_INPUT);
+	}
+	LinkedList<int, int> *playing_teams;
+	playing_teams = export_lagitimate_teams_to_list(minTeamId, maxTeamId);
+	if (playing_teams->size <= 0) {
+		return output_t<int>(StatusType::FAILURE);
+	}
+	LinkedList_Node<int, int> * first_team = playing_teams->head->next, *second_team;
+	int new_value;
+	while(playing_teams->size > 1) {
+		second_team = first_team->next;
+		while (first_team->next != nullptr){
+			new_value = first_team->value + second_team->value + POINTS_TO_ADD;
+			if(first_team->value < second_team->value || (first_team->value == second_team->value && first_team->key < second_team->key)) {
+				first_team->key = second_team->key;
+			}
+			first_team->value = new_value;
+			playing_teams->remove_node(second_team);
+			first_team = first_team->next;
+		}
+		first_team = playing_teams->head->next;
+	}
+	assert(playing_teams->size == 1);
+	return output_t<int>(playing_teams->head->next->key);
     // if num players < num teams, get player list, and
     //todo: create "valid" teams
     //teams.Recursive_export_to_array()
 }
 
+///// -------------------- private methods ---------------------
+
+LinkedList<int, int>* world_cup_t::export_lagitimate_teams_to_list(int minTeamId, int maxTeamId) {
+	LinkedList<int, int>* playing_teams = new LinkedList<int, int>();
+	recursive_export_to_list(minTeamId, maxTeamId, legitimate_teams.root, playing_teams);
+	return playing_teams;
+}
+
+void world_cup_t::recursive_export_to_list(int minTeamId, int maxTeamId, Node<int, Team*>* start, LinkedList<int, int>* list) {
+	int key = start->key;
+	if ( key < minTeamId ) {
+		if (start->right == nullptr) {
+			return ;
+		}
+		recursive_export_to_list(minTeamId, maxTeamId, start->right, list);
+	}
+	if (key >= minTeamId && key <= maxTeamId) {
+		int score = start->value->get_overall_score();
+		list->add(key, score);
+	}
+	if (key  > maxTeamId) {
+		if (start->left == nullptr) {
+			return ;
+		}
+		recursive_export_to_list(minTeamId, maxTeamId, start->left, list);
+	}
+}

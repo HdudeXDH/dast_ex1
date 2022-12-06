@@ -26,7 +26,7 @@ StatusType world_cup_t::add_team(int teamId, int points)
 	}
 	Node<Team_id, Team> *search_result = teams.search(teamId, true);
 	if(search_result != nullptr) {
-		return StatusType::FAILURE;
+		if (search_result->value.id ==teamId) return StatusType::FAILURE;
 	}
 	try {
 //		Team* new_team = new
@@ -71,7 +71,7 @@ StatusType world_cup_t::remove_team(int teamId)
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
                                    int goals, int cards, bool goalKeeper)
 {
-	if (playerId <= 0 || teamId <= 0 || gamesPlayed <= 0 || goals <=0 || cards <= 0 ) {
+	if (playerId <= 0 || teamId <= 0 || gamesPlayed < 0 || goals <0 || cards < 0 ) {
 		return StatusType::INVALID_INPUT;
 	}
 	Node<Team_id, Team> *team_search_result = teams.search(teamId);
@@ -87,10 +87,23 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
         Node<PlayerLevel, Player*> *new_player_by_level = players_by_level.add(*new_player->value.level, &new_player->value);
         Node<PlayerLevel, Player*> *nextup = players_by_level.find_next_up(new_player_by_level);
 
-        nextup->value->next_down->next_up=new_player_by_level->value; // nextdown.nextup=current
-        new_player_by_level->value->next_down=nextup->value->next_down; // current.nextdown=nextdown
-        nextup->value->next_down=new_player_by_level->value;//nextup.nextdown = current
-        new_player_by_level->value->next_up=nextup->value;//current.nextup=nextup
+        Player* nextdown;
+        if (nextup== nullptr){
+            nextdown = top_scorrer;
+            top_scorrer=new_player_by_level->value;
+        } else {
+            nextdown = nextup->value->next_down;
+            new_player_by_level->value->next_down=nextup->value->next_down;
+            nextup->value->next_down=new_player_by_level->value;
+            new_player_by_level->value->next_up=nextup->value;
+        }
+        if (nextdown != nullptr){
+            nextdown->next_up=new_player_by_level->value;
+        }
+         // nextdown.nextup=current
+         // current.nextdown=nextdown
+        //nextup.nextdown = current
+        //current.nextup=nextup
 
 
 		bool was_team_legitimate_before_adding = team_to_add_player->is_legitimate_for_match();
@@ -245,6 +258,8 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     }
     add_team(newTeamId,team1_node->value.points+team2_node->value.points);
     Node <int, Team> * newteam_node = teams.search(newTeamId);
+    if (newteam_node== nullptr){
+    }
     Team & newteam = newteam_node->value;
     Team & team1 = team1_node->value;
     Team & team2 = team2_node->value;

@@ -570,7 +570,7 @@ void AVLTree<K,V>::Recursive_export_to_array(Node<K,V>* root, Node<K,V> **array,
 
 template <typename K,typename V>
 void AVLTree<K,V>::merge_trees(AVLTree<K,V> & tree1, AVLTree<K,V> & tree2) {
-    if (!is_empty()) {throw AVLTreeNotEmpty();}
+//    if (!is_empty()) {throw AVLTreeNotEmpty();}
 	int tree1_size = tree1.size, tree2_size = tree2.size;
 	Node<K, V>** tree1_array = tree1.export_to_array();
 	Node<K, V>** tree2_array = tree2.export_to_array();

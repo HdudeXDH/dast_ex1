@@ -61,7 +61,15 @@ void Team::validate_sizes() {
 }
 
 int Player::get_total_games_played() {
-    return (team->games_played + games_played);
+    return (team->games_played + games_played - teams_matches_pre_arrival_count);
+}
+
+
+Player::Player(int playerId, Team* team, int gamesPlayed, int goals, int cards, bool goalKeeper):
+        id(playerId), team(team), games_played(gamesPlayed), goals(goals), cards(cards), is_goal_keeper(goalKeeper), next_up(nullptr), next_down(
+        nullptr) {
+    level = new PlayerLevel(goals, cards, playerId);
+    teams_matches_pre_arrival_count=team->games_played;
 }
 //void Team::update_team_stats(int playerId, int gamesPlayed, int scoredGoals, int cardsReceived) {
 //

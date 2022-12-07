@@ -17,7 +17,7 @@ public:
 
 	// Ctor & Dtor
 	LinkedList_Node() = default;
-	LinkedList_Node(K key,V value): key(key), value(value){};
+	LinkedList_Node(K key,V value): key(key), value(value), next(nullptr), prev(nullptr){};
 
 	// methods :
 //	LinkedList_Node<K,V>* compare_and_unite_node_with_next(LinkedList_Node<K,V>* node);

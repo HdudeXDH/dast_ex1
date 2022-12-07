@@ -22,11 +22,7 @@ bool PlayerLevel::operator==(const PlayerLevel & otherlevel) {
 }
 
 
-Player::Player(int playerId, Team* team, int gamesPlayed, int goals, int cards, bool goalKeeper):
-		id(playerId), team(team), games_played(gamesPlayed), goals(goals), cards(cards), is_goal_keeper(goalKeeper), next_up(nullptr), next_down(
-		nullptr) {
-	level = new PlayerLevel(goals, cards, playerId);
-}
+//ctor at team cpp
 
 void Player::update_level() {
 	level->cards = cards;

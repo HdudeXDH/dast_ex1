@@ -124,10 +124,12 @@ Node<K,V>* AVLTree<K, V>::find_next_up(Node<K,V> * start){
     if (start->right!= nullptr){
         return AVLTree<K, V>::min(start->right);
     }
+    Node<K,V>* current = start;
     Node<K,V>* parent = start->parent;
-    while (parent!= nullptr && start==parent->right){
-        start=parent;
-        parent=parent;
+    while (parent!= nullptr && current==parent->right){
+
+        current=parent;
+        parent=current->parent;
     }
     return parent;
 };

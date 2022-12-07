@@ -2,6 +2,7 @@
 #define DAST_EX1_TEAM_H
 #include "AVLTree.h"
 #include "Player.h"
+#include "Utils.h" //todo: delete this row
 //#include "Team.h"
 #define EMPTY_NUM 0
 #define ZERO 0

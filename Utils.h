@@ -13,7 +13,8 @@
 //};
 
 //
-void printBT(const std::string& prefix, const Node<int,int> * node, bool isLeft)
+template <typename K,typename V>
+void printBT(const std::string& prefix, const Node<K,V> * node, bool isLeft)
 {
     if( node != nullptr )
     {
@@ -35,7 +36,10 @@ void printBT(const std::string& prefix, const Node<int,int> * node, bool isLeft)
         if (node->right!= nullptr){
             rightkey = std::to_string(node->right->key);
         }
-        std::cout <<"(" <<node->key<<",p:"<<parentkey<<",l:"<<leftkey<<",r:"<<rightkey<<")" << std::endl;
+        std::string height = "None";
+        height = std::to_string(node->height);
+
+        std::cout <<"(" <<node->key<<",p:"<<parentkey<<",l:"<<leftkey<<",r:"<<rightkey<<",h:"<<height<<")" << std::endl;
 
         // enter the next tree level - left and right branch
         printBT( prefix + (isLeft ? "│   " : "    "), node->left, true);
@@ -43,7 +47,8 @@ void printBT(const std::string& prefix, const Node<int,int> * node, bool isLeft)
     }
 }
 
-void printBT(const Node<int,int> * node)
+template <typename K,typename V>
+void printBT(const Node<K,V> * node)
 {
     printBT("", node, false);
 }

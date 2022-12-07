@@ -166,26 +166,26 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
     if (player_node_in_id_tree == nullptr) {
         return StatusType::FAILURE;
     }
-    Player & player = player_node_in_id_tree->value; //todo: maybe bug, validate
+    Player * player = &(player_node_in_id_tree->value); //todo: maybe bug, validate
     //update next_up & next down
-    if (player.next_down != nullptr) {player.next_down->next_up = player.next_up;}
-    if (player.next_up != nullptr) {player.next_up->next_down = player.next_down;}
+    if (player->next_down != nullptr) {player->next_down->next_up = player->next_up;}
+    if (player->next_up != nullptr) {player->next_up->next_down = player->next_down;}
 
-    Team * team = player.team;
+    Team * team = player->team;
 	try {
-		players_by_level.remove_by_key(*player.level);
+		players_by_level.remove_by_key(*player->level);
 	} catch (std::exception& err) {
 		return StatusType::ALLOCATION_ERROR;
 	}
 	// remove (in order to add)
-	team->remove_player_from_team(&player);
-	player.games_played = (player.games_played + gamesPlayed);
-	player.goals = (player.goals + scoredGoals);
-	player.cards = (player.cards + cardsReceived);
-	player.update_level();
+	team->remove_player_from_team(player);
+	player->games_played = (player->games_played + gamesPlayed);
+	player->goals = (player->goals + scoredGoals);
+	player->cards = (player->cards + cardsReceived);
+	player->update_level();
 	try {
-		players_by_level.add(*player.level, &player);
-		team->add_player_to_team(&player);
+		players_by_level.add(*player->level, player);
+		team->add_player_to_team(player);
 	} catch (std::exception& err) {
 		return StatusType::ALLOCATION_ERROR;
 	}

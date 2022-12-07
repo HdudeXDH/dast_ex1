@@ -53,6 +53,7 @@ private:
 	void LR_rotate(Node<K,V>* dest);
 	void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = true);
 	void swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2);
+	void swap_nodes(Node<K, V> *node1, Node<K, V> *node2);
 
 
 
@@ -321,7 +322,7 @@ void AVLTree<K,V>::create_avl_from_array(Node<K, V>** array, int n){
     size = n;
 };
 
-
+// todo big big fucking problem
 template <typename K,typename V>
 Node<K,V>* AVLTree<K,V>::remove_Node(Node<K, V> *to_remove, Node<K, V> *start_node) {
     //todo: node is root?
@@ -337,8 +338,8 @@ Node<K,V>* AVLTree<K,V>::remove_Node(Node<K, V> *to_remove, Node<K, V> *start_no
 		return AVLTree::remove_link_from_chain(to_remove);
 	} else {
 		follower = AVLTree<K,V>::min(to_remove->right);
-		swap_keys_and_values(to_remove, follower); //todo: maybe better to use dummy, will be problem in player
-		return remove_Node(follower, to_remove->right);
+		swap_nodes(to_remove, follower); //todo: maybe better to use dummy, will be problem in player
+		return remove_Node(to_remove, to_remove->right);
 	}
 
 	return nullptr;
@@ -354,7 +355,57 @@ void AVLTree<K,V>::swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2) {
 	node1->value = node2->value;
 	node2->value = temp_value;
 }
+template<typename K, typename  V>
+void AVLTree<K,V>::swap_nodes(Node<K, V> *node1, Node<K, V> *node2) {
+	//handle root
+	if (node1 == root) {
+		root = node2;
+	}
+	if (node2 == root) {
+		swap_nodes(node2, node1);
+	}
+	Node<K,V> *temp_right_ptr, *temp_left_ptr, *temp_parent_ptr;
+	// set temp values for later
+	temp_left_ptr = node1->left;
+	temp_right_ptr = node1->right;
+	temp_parent_ptr = node1->parent;
 
+	// set parent and sons for node1
+	node1->right = node2->right;
+	if (node2->right != nullptr) {
+		node1->right->parent = node1;
+	}
+	node1->left = node2->left;
+	if (node2->left != nullptr) {
+		node1->left->parent = node1;
+	}
+	node1->parent = node2->parent;
+	if (node2->parent != nullptr) {
+		if (node2->parent->right == node2) {
+			node1->parent->right = node1;
+		} else {
+			node1->parent->left = node1;
+		}
+	}
+
+	// set parent and sons for node2
+	node2->right = temp_right_ptr;
+	if (temp_right_ptr != nullptr) {
+		temp_right_ptr->parent = node2;
+	}
+	node2->left = temp_left_ptr;
+	if (temp_left_ptr != nullptr) {
+		temp_left_ptr->parent = node2;
+	}
+	node2->parent = temp_parent_ptr;
+	if (temp_left_ptr != nullptr) {
+		if (temp_left_ptr->right == node2) {
+			temp_left_ptr->right = node2;
+		} else {
+			node1->parent->left = node2;
+		}
+	}
+}
 template<typename K, typename  V>
 Node<K,V>* AVLTree<K,V>::remove_leaf(Node<K, V> *leaf_to_remove){
 	assert(leaf_to_remove->right == nullptr && leaf_to_remove->left == nullptr);

@@ -67,7 +67,9 @@ public:
         int ix = 0;
         Node<K, V> * allNodes[n];
         Recursive_export_to_array(root,allNodes, &ix);
-        for (int i =0; i<n;i++){delete allNodes[i];}
+        for (int i =0; i<n;i++){
+            delete allNodes[i];
+        }
     };
 
 	//basic methods
@@ -301,7 +303,7 @@ Node<K,V>* AVLTree<K,V>::remove_by_key(const K& key, Node<K, V> *start_node){
 
 template <typename K,typename V>
 void AVLTree<K,V>::create_avl_from_array(Node<K, V>** array, int n){
-    if (!this->is_empty()){throw AVLTree<K,V>::AVLTreeNotEmpty();}
+//    if (!this->is_empty()){throw AVLTree<K,V>::AVLTreeNotEmpty();}
     root = sortedArrayToBST(array, 0, n); //todo maybe should be n-1
     size = n;
 };
@@ -313,6 +315,7 @@ Node<K,V>* AVLTree<K,V>::remove_Node(Node<K, V> *to_remove, Node<K, V> *start_no
     //todo: return?
 	Node<K, V> * follower;
 	bool has_two_sons = to_remove->has_two_sons();
+//    size=size-1;
 	// if node is leaf
 	if (to_remove->is_leaf()) {
 		AVLTree::remove_leaf(to_remove);
@@ -324,6 +327,7 @@ Node<K,V>* AVLTree<K,V>::remove_Node(Node<K, V> *to_remove, Node<K, V> *start_no
 		swap_keys_and_values(to_remove, follower); //todo: maybe better to use dummy, will be problem in player
 		return remove_Node(follower, to_remove->right);
 	}
+
 	return nullptr;
 }
 
@@ -681,7 +685,7 @@ Node<K,V>** AVLTree<K,V>::merge_arrays(Node<K,V> * arr1[], Node<K,V> * arr2[], i
     while (i < m && j < n)
     {
         // Pick the smaller element and put it in mergedArr
-        if (arr2[i]->key > arr1[j]->key)
+        if (arr1[i]->key < arr2[j]->key)
         {
             mergedArr[k] = arr1[i];
             i++;

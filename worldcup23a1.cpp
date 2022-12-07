@@ -2,10 +2,10 @@
 
 world_cup_t::world_cup_t(): top_scorrer(nullptr), players_count(EMPTY_NUM)
 {
-	players_by_id = AVLTree<int, Player>();//AVLTree<Player_id, Player*>();
-	players_by_level = AVLTree<PlayerLevel, Player*>();
-	teams = AVLTree<int , Team>();//AVLTree<Team_id , Team*>();
-	legitimate_teams = AVLTree<int, Team*>();
+    legitimate_teams = AVLTree<int, Team*>();
+    players_by_level = AVLTree<PlayerLevel, Player*>();
+    teams = AVLTree<int , Team>();//AVLTree<Team_id , Team*>();
+    players_by_id = AVLTree<int, Player>();//AVLTree<Player_id, Player*>();
 }
 
 world_cup_t::~world_cup_t()
@@ -59,6 +59,8 @@ StatusType world_cup_t::remove_team(int teamId)
 	}
 	try {
 		teams.remove_by_key(teamId);
+        legitimate_teams.remove_by_key(teamId);
+
 //		delete team_to_remove;
 	}
 	// todo check what is the spesific type of the deletion exeption
@@ -136,9 +138,10 @@ StatusType world_cup_t::remove_player(int playerId)
 	try {
 		// remove player from all AVL trees
 		bool was_team_legitimate_before_removing = players_team->is_legitimate_for_match();
-		players_by_id.remove_Node(player_node_in_id_tree);
-		players_by_level.remove_Node(player_node_in_level_tree);
+
+		players_by_level.remove_by_key(player_node_in_level_tree->key);
 		players_team->remove_player_from_team(player_to_remove);
+        players_by_id.remove_by_key(player_node_in_id_tree->key);
 		players_count = players_count - 1;
 		if (was_team_legitimate_before_removing && !players_team->is_legitimate_for_match()) {
 			legitimate_teams.remove_by_key(players_team->id);
@@ -351,7 +354,7 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 
 output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 {
-	if (minTeamId <= 0 || maxTeamId <= 0 || minTeamId > maxTeamId) {
+	if (minTeamId < 0 || maxTeamId < 0 || minTeamId > maxTeamId) {
 		return output_t<int>(StatusType::INVALID_INPUT);
 	}
 	LinkedList<int, int> *playing_teams;

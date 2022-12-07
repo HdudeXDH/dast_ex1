@@ -254,14 +254,22 @@ output_t<int> world_cup_t::get_team_points(int teamId)
 
 StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 {
-
+	// team search and validation
     Node <int, Team> * team1_node = teams.search(teamId1);
     Node <int, Team> * team2_node = teams.search(teamId2);
-    if (team1_node == nullptr || team2_node== nullptr ) {
-        return StatusType::FAILURE;
-    }
-    add_team(newTeamId,team1_node->value.points+team2_node->value.points);
-    Node <int, Team> * newteam_node = teams.search(newTeamId);
+    if (team1_node == nullptr || team2_node== nullptr) {
+		return StatusType::FAILURE;
+	}
+	Node <int, Team> * newteam_node = teams.search(newTeamId);
+	if (newteam_node != nullptr && newteam_node != team1_node && newteam_node != team2_node) {
+		return StatusType::FAILURE;
+	}
+
+	// create new team if the teamid is new
+	if (newteam_node != team1_node && newteam_node != team2_node) {
+		add_team(newTeamId,team1_node->value.points+team2_node->value.points);
+	}
+	newteam_node = teams.search(newTeamId);
     if (newteam_node== nullptr){
     }
     Team & newteam = newteam_node->value;
@@ -270,10 +278,12 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     //todo: update all players
     Node<PlayerLevel, Player*>** team1_array = team1.players.export_to_array();
     for (int i=0;i<team1.players_count;i++){
+		team1_array[i]->value->team = &newteam;
         team1_array[i]->value->games_played+=team1.games_played-team1_array[i]->value->teams_matches_pre_arrival_count;
     }
     Node<PlayerLevel, Player*>** team2_array = team2.players.export_to_array();
     for (int i=0;i<team2.players_count;i++){
+		team2_array[i]->value->team = &newteam;
         team2_array[i]->value->games_played+=team2.games_played-team2_array[i]->value->teams_matches_pre_arrival_count;
     }
     //merging the trees

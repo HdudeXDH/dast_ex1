@@ -119,7 +119,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 	catch (std::bad_alloc& err){
 		return StatusType::ALLOCATION_ERROR;
 	}
-    team_to_add_player->validate_sizes();
+//    team_to_add_player->validate_sizes();
 	return StatusType::SUCCESS;
 }
 
@@ -291,7 +291,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     if (teamId2!=newTeamId){
         teams.remove_by_key(teamId2);
     }
-    newteam.validate_sizes();
+//    newteam.validate_sizes();
 	return StatusType::SUCCESS;
 }
 

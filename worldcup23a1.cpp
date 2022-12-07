@@ -368,22 +368,33 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 		return output_t<int>(StatusType::INVALID_INPUT);
 	}
 	LinkedList<int, int> *playing_teams;
-	playing_teams = export_lagitimate_teams_to_list(minTeamId, maxTeamId);
+//    int ix=0;
+//    Node<int, Team> * deleteme[teams.size];
+//    teams.Recursive_export_to_array(teams.root, deleteme,&ix);
+//    int ix2=0;
+//    Node<int, Team*> * deleteme2[legitimate_teams.size];
+//    legitimate_teams.Recursive_export_to_array(legitimate_teams.root, deleteme2,&ix2);
+    playing_teams = export_lagitimate_teams_to_list(minTeamId, maxTeamId);
 	if (playing_teams->size <= 0) {
 		return output_t<int>(StatusType::FAILURE);
 	}
 	LinkedList_Node<int, int> * first_team = playing_teams->head->next, *second_team;
+    LinkedList_Node<int, int> *next_pair;
 	int new_value;
 	while(playing_teams->size > 1) {
-		second_team = first_team->next;
-		while (first_team->next != nullptr){
+		while (first_team!=nullptr && first_team->next != nullptr){
+            second_team = first_team->next;
 			new_value = first_team->value + second_team->value + POINTS_TO_ADD;
+            next_pair = second_team->next;
 			if(first_team->value < second_team->value || (first_team->value == second_team->value && first_team->key < second_team->key)) {
-				first_team->key = second_team->key;
-			}
-			first_team->value = new_value;
-			playing_teams->remove_node(second_team);
-			first_team = first_team->next;
+                second_team->value = new_value;
+                playing_teams->remove_node(first_team);
+			} else {
+                first_team->value = new_value;
+                playing_teams->remove_node(second_team);
+            }
+            first_team = next_pair;
+
 		}
 		first_team = playing_teams->head->next;
 	}
@@ -399,7 +410,16 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 
 LinkedList<int, int>* world_cup_t::export_lagitimate_teams_to_list(int minTeamId, int maxTeamId) {
 	LinkedList<int, int>* playing_teams = new LinkedList<int, int>();
-	recursive_export_to_list(minTeamId, maxTeamId, legitimate_teams.root, playing_teams);
+    int ix2=0;
+    Node<int, Team*> * raw_array[legitimate_teams.size];
+    legitimate_teams.Recursive_export_to_array(legitimate_teams.root, raw_array,&ix2);
+    for (int i=0;i<ix2;i++){
+        if ((raw_array[i]->key <=maxTeamId)&&(raw_array[i]->key >=minTeamId)){
+            playing_teams->add(raw_array[i]->key, raw_array[i]->value->get_overall_score());
+        }
+
+    }
+//	recursive_export_to_list(minTeamId, maxTeamId, legitimate_teams.root, playing_teams);
 	return playing_teams;
 }
 

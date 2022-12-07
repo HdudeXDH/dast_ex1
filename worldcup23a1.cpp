@@ -119,6 +119,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 	catch (std::bad_alloc& err){
 		return StatusType::ALLOCATION_ERROR;
 	}
+    team_to_add_player->validate_sizes();
 	return StatusType::SUCCESS;
 }
 
@@ -281,14 +282,16 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     newteam.players_count = team1.players_count + team2.players_count;
     newteam.goal_keepers_count = team1.goal_keepers_count + team2.goal_keepers_count;
     newteam.power = team1.power + team2.power;
+
+    if (*team1.top_scorrer->level>*team2.top_scorrer->level) {newteam.top_scorrer= team1.top_scorrer;}
+    else {newteam.top_scorrer= team2.top_scorrer;}
     if (teamId1!=newTeamId){
         teams.remove_by_key(teamId1);
     }
     if (teamId2!=newTeamId){
         teams.remove_by_key(teamId2);
     }
-    if (*team1.top_scorrer->level>*team2.top_scorrer->level) {newteam.top_scorrer= team1.top_scorrer;}
-    else {newteam.top_scorrer= team2.top_scorrer;}
+    newteam.validate_sizes();
 	return StatusType::SUCCESS;
 }
 

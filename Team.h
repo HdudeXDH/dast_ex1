@@ -35,6 +35,7 @@ public:
 	bool is_legitimate_for_match();
 	int get_overall_score();
 	void bump_games_played();
+    void validate_sizes();
 
 
 //    Team(int id, int points, Player* top_scorrer = nullptr, int power = ZERO, int games_played = ZERO, bool has_goal_keeper = false);

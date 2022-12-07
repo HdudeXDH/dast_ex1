@@ -56,6 +56,10 @@ void Team::bump_games_played() {
 	this->games_played = this->games_played + 1;
 }
 
+void Team::validate_sizes() {
+	std::cout<<this->players_count<<", "<<this->players.size<<", "<<this->players_by_id.size<<std::endl;
+}
+
 int Player::get_total_games_played() {
     return (team->games_played + games_played);
 }

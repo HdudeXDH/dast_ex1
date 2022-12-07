@@ -305,7 +305,7 @@ Node<K,V>* AVLTree<K,V>::remove_by_key(const K& key, Node<K, V> *start_node){
 template <typename K,typename V>
 void AVLTree<K,V>::create_avl_from_array(Node<K, V>** array, int n){
 //    if (!this->is_empty()){throw AVLTree<K,V>::AVLTreeNotEmpty();}
-    root = sortedArrayToBST(array, 0, n); //todo maybe should be n-1
+    root = sortedArrayToBST(array, 0, n-1); //todo maybe should be n-1
     size = n;
 };
 
@@ -579,9 +579,18 @@ void AVLTree<K,V>::merge_trees(AVLTree<K,V> & tree1, AVLTree<K,V> & tree2) {
 	int tree1_size = tree1.size, tree2_size = tree2.size;
 	Node<K, V>** tree1_array = tree1.export_to_array();
 	Node<K, V>** tree2_array = tree2.export_to_array();
-    Node<K,V>* mergedArr[tree1.size + tree2.size];
+    if (this != &tree1){
+        tree1.root= nullptr;
+        tree1.size=0;
+    }
+    if (this != &tree2){
+        tree2.root= nullptr;
+        tree2.size=0;
+    }
+    Node<K,V>* mergedArr[tree1_size + tree2_size];
 	Node<K, V>** merged_array = merge_arrays(tree1_array, tree2_array, tree1_size, tree2_size,mergedArr);
 	create_avl_from_array(merged_array,tree1_size+tree2_size);
+    this->size=tree1_size+tree2_size;
 }
 
 /**

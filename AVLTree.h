@@ -273,6 +273,9 @@ Node<K,V>* AVLTree<K,V>::max_node( Node<K,V>* start) {
 
 template <typename K,typename V>
 Node<K,V>* AVLTree<K,V>::remove_by_key(const K& key, Node<K, V> *start_node){
+	if (start_node == nullptr) {
+		start_node = root;
+	}
 	Node<K, V> *target = search(key, false, start_node);
     if (target == nullptr){
         throw AVLTree<K,V>::NodeDoesntExists();

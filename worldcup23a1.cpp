@@ -356,9 +356,27 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
 
 output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 {
-	// TODO: Your code goes here
+	// TODO: what if invalid/doesnt Exist teamID/playerId?
     Node <int, Team> * team_node = teams.search(teamId);
+    if (team_node== nullptr){
+        return StatusType::FAILURE;
+    }
     Node <int, Player*> * player_node = team_node->value.players_by_id.search(playerId);
+    if (player_node== nullptr){
+        return StatusType::FAILURE;
+    }
+//    Node <int, Player> * res;
+//    if (playerId==173){
+//        Node <PlayerLevel, Player*> ** testArr =players_by_level.export_to_array();
+//        for (int i=0; i<players_by_level.size;i++){
+//            std::cout<<testArr[i]->value->id<<"("<<testArr[i]->value->goals<<","<<testArr[i]->value->cards<<")"<<std::endl;
+//        }
+//        res=  players_by_id.search(75);
+//
+//    }
+
+
+
 	return player_node->value->getCloset()->id;
 }
 

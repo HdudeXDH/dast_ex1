@@ -140,9 +140,9 @@ StatusType world_cup_t::remove_player(int playerId)
 		bool was_team_legitimate_before_removing = players_team->is_legitimate_for_match();
 
 		players_by_level.remove_by_key(player_node_in_level_tree->key);
-		players_team->remove_player_from_team(player_to_remove);
+        players_team->remove_player_from_team(player_to_remove);
         players_by_id.remove_by_key(player_node_in_id_tree->key);
-		players_count = players_count - 1;
+        players_count = players_count - 1;
 		if (was_team_legitimate_before_removing && !players_team->is_legitimate_for_match()) {
 			legitimate_teams.remove_by_key(players_team->id);
 		}
@@ -277,9 +277,16 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     }
     //merging the trees
     newteam.players.merge_trees(team1.players,team2.players);
+    newteam.players_by_id.merge_trees(team1.players_by_id,team2.players_by_id);
     newteam.players_count = team1.players_count + team2.players_count;
     newteam.goal_keepers_count = team1.goal_keepers_count + team2.goal_keepers_count;
-    newteam.power = team1.power + team2.power; //todo: check that its correct!!
+    newteam.power = team1.power + team2.power;
+    if (teamId1!=newTeamId){
+        teams.remove_by_key(teamId1);
+    }
+    if (teamId2!=newTeamId){
+        teams.remove_by_key(teamId2);
+    }
     if (*team1.top_scorrer->level>*team2.top_scorrer->level) {newteam.top_scorrer= team1.top_scorrer;}
     else {newteam.top_scorrer= team2.top_scorrer;}
 	return StatusType::SUCCESS;

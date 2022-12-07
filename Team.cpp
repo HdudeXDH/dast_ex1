@@ -5,7 +5,9 @@
 
 Team::Team(int id, int points): id(id), points(points), top_scorrer(nullptr), players_count(EMPTY_NUM),
 								goal_keepers_count(EMPTY_NUM), power(EMPTY_NUM), games_played(EMPTY_NUM) {
-		players = AVLTree<PlayerLevel, Player*>();
+    {players = AVLTree<PlayerLevel, Player*>();
+        players_by_id = AVLTree<int, Player*>();
+            };
 }
 
 void Team::add_player_to_team(Player* player) {

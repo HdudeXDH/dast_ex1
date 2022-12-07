@@ -5,8 +5,9 @@
 #include <exception>
 #include <memory>
 #include <iostream>
+//#include "tools.h"
 //#include "Utils.h"
-#define max(X, Y) (((X) > (Y)) ? (X) : (Y))
+//#define max(X, Y) (((X) > (Y)) ? (X) : (Y))
 
 //template <typename K, typename V>
 //class Node {
@@ -93,6 +94,12 @@ public:
     Node<K,V>** merge_arrays(Node<K,V> * arr1[], Node<K,V> * arr2[], int m, int n, Node<K,V> * mergedArr[]);
 	void Recursive_export_to_array(Node<K,V>* root, Node<K,V> **array, int *indexPtr);
     Node<K,V>* find_next_up(Node<K,V> * start);
+    int max(int a, int b){
+        if (a>b){
+            return a;
+        }
+        else return b;
+    }
 //    Node<K,V>* find_next_down(Node<K,V> * start);
 
 
@@ -506,12 +513,13 @@ void AVLTree<K,V>::RR_rotate(Node<K,V>* b){
     if (b==root){
         root=a;
     }
-
+//    printBT(root);
     // Update heights
-    a->height = max(get_height(a->left),
-                    get_height(a->right)) + 1;
     b->height = max(get_height(b->left),
                     get_height(b->right)) + 1;
+    a->height = max(get_height(a->left),
+                    get_height(a->right)) + 1;
+//    printBT(root);
 //    Node<K,V> *y = dest->right;
 //    Node<K,V> *T2 = y->left;
 //

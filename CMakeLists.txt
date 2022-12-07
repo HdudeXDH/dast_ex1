@@ -11,4 +11,5 @@ add_executable(dast_ex1
         worldcup23a1.cpp
         worldcup23a1.h player.cpp team.cpp)
 
-#add_executable(dast_ex1 main.cpp test_maker/test_AVL_insertions_deletions.h test_maker/test_AVL_memory_leaks.h)
+#add_executable(dast_ex1 main.cpp )
+#

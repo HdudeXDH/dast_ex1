@@ -88,7 +88,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
         Node<int, Player> *new_player = players_by_id.add(playerId, Player(playerId,&team_search_result->value, gamesPlayed, goals, cards, goalKeeper));
         Node<PlayerLevel, Player*> *new_player_by_level = players_by_level.add(*new_player->value.level, &new_player->value);
         Node<PlayerLevel, Player*> *nextup = players_by_level.find_next_up(new_player_by_level);
-        printBT(players_by_id.root);
+//        printBT(players_by_id.root);
         Player* nextdown;
 //        if (nextup!=nullptr) std::cout <<new_player_by_level->value->id<<"("<<new_player_by_level->value->goals<<"), nextup:"<<nextup->value->id<<", goals:"<<nextup->value->goals<<std::endl;
 //        else{ std::cout <<new_player_by_level->value->id<<"newBig("<<new_player_by_level->value->goals<<")"<<std::endl;}
@@ -381,7 +381,7 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
     if (playerId==173){
         Node <PlayerLevel, Player*> ** testArr =players_by_level.export_to_array();
         for (int i=0; i<players_by_level.size;i++){
-            std::cout<<testArr[i]->value->id<<"("<<testArr[i]->value->goals<<","<<testArr[i]->value->cards<<")"<<std::endl;
+//            std::cout<<testArr[i]->value->id<<"("<<testArr[i]->value->goals<<","<<testArr[i]->value->cards<<")"<<std::endl;
         }
         res=  players_by_id.search(75);
 

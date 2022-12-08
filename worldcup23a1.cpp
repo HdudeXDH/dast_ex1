@@ -141,7 +141,8 @@ StatusType world_cup_t::remove_player(int playerId)
 	try {
 		// remove player from all AVL trees
 		bool was_team_legitimate_before_removing = players_team->is_legitimate_for_match();
-
+		if (player_to_remove->next_down != nullptr) {player_to_remove->next_down->next_up = player_to_remove->next_up;}
+		if (player_to_remove->next_up != nullptr) {player_to_remove->next_up->next_down = player_to_remove->next_down;}
 		players_by_level.remove_by_key(player_node_in_level_tree->key);
         players_team->remove_player_from_team(player_to_remove);
         players_by_id.remove_by_key(player_node_in_id_tree->key);
@@ -161,6 +162,7 @@ StatusType world_cup_t::remove_player(int playerId)
 StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
                                         int scoredGoals, int cardsReceived)
 {
+	Node<int, Player> * player75 = players_by_id.search(75);
 	if (playerId <= 0 || gamesPlayed <= 0 || scoredGoals <= 0 || cardsReceived <=0) {
 		return StatusType::INVALID_INPUT;
 	}
@@ -259,11 +261,11 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 	// team search and validation
     Node <int, Team> * team1_node = teams.search(teamId1);
     Node <int, Team> * team2_node = teams.search(teamId2);
-    if (team1_node == nullptr || team2_node== nullptr) {
+    if (team1_node == nullptr || team2_node == nullptr) {
 		return StatusType::FAILURE;
 	}
 	Node <int, Team> * newteam_node = teams.search(newTeamId);
-	if (newteam_node != nullptr && newteam_node != team1_node && newteam_node != team2_node) {
+	if ((newteam_node != nullptr) && (newteam_node != team1_node) && (newteam_node != team2_node)) {
 		return StatusType::FAILURE;
 	}
 
@@ -274,36 +276,37 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 	newteam_node = teams.search(newTeamId);
     if (newteam_node== nullptr){
     }
-    Team & newteam = newteam_node->value;
-    Team & team1 = team1_node->value;
-    Team & team2 = team2_node->value;
+    Team * newteam = &(newteam_node->value);
+    Team * team1 = &(team1_node->value);
+    Team * team2 = &(team2_node->value);
     //todo: update all players
-    Node<PlayerLevel, Player*>** team1_array = team1.players.export_to_array();
-    for (int i=0;i<team1.players_count;i++){
-		team1_array[i]->value->team = &newteam;
-        team1_array[i]->value->games_played+=team1.games_played-team1_array[i]->value->teams_matches_pre_arrival_count;
+    Node<PlayerLevel, Player*>** team1_array = team1->players.export_to_array();
+	Node<int, Player> * player75 = players_by_id.search(75);
+    for (int i=0;i<team1->players_count;i++){
+		team1_array[i]->value->team = newteam;
+        team1_array[i]->value->games_played+=team1->games_played-team1_array[i]->value->teams_matches_pre_arrival_count;
     }
-    Node<PlayerLevel, Player*>** team2_array = team2.players.export_to_array();
-    for (int i=0;i<team2.players_count;i++){
-		team2_array[i]->value->team = &newteam;
-        team2_array[i]->value->games_played+=team2.games_played-team2_array[i]->value->teams_matches_pre_arrival_count;
+    Node<PlayerLevel, Player*>** team2_array = team2->players.export_to_array();
+    for (int i=0;i<team2->players_count;i++){
+		team2_array[i]->value->team = newteam;
+        team2_array[i]->value->games_played+=team2->games_played-team2_array[i]->value->teams_matches_pre_arrival_count;
     }
     //merging the trees
-    newteam.players.merge_trees(team1.players,team2.players);
-    newteam.players_by_id.merge_trees(team1.players_by_id,team2.players_by_id);
-    newteam.players_count = team1.players_count + team2.players_count;
-    newteam.goal_keepers_count = team1.goal_keepers_count + team2.goal_keepers_count;
-    newteam.power = team1.power + team2.power;
+    newteam->players.merge_trees(team2->players,team2->players);
+    newteam->players_by_id.merge_trees(team2->players_by_id,team2->players_by_id);
+    newteam->players_count = team1->players_count + team2->players_count;
+    newteam->goal_keepers_count = team1->goal_keepers_count + team2->goal_keepers_count;
+    newteam->power = team1->power + team2->power;
 
-    if (*team1.top_scorrer->level>*team2.top_scorrer->level) {newteam.top_scorrer= team1.top_scorrer;}
-    else {newteam.top_scorrer= team2.top_scorrer;}
+    if (*team1->top_scorrer->level>*team2->top_scorrer->level) {newteam->top_scorrer= team1->top_scorrer;}
+    else {newteam->top_scorrer= team2->top_scorrer;}
     if (teamId1!=newTeamId){
         teams.remove_by_key(teamId1);
     }
     if (teamId2!=newTeamId){
         teams.remove_by_key(teamId2);
     }
-//    newteam.validate_sizes();
+//    newteam->validate_sizes();
 	return StatusType::SUCCESS;
 }
 

@@ -428,6 +428,9 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
     if (teamId == 0 || output == nullptr) {
 		return StatusType::INVALID_INPUT;
 	}
+	if (players_by_id.size == 0 ) {
+		return StatusType::FAILURE;
+	}
 	if (teamId > 0 ) {
         Node <int, Team> * team_node = teams.search(teamId);
 
@@ -435,13 +438,21 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
             return StatusType::FAILURE;
         }
         Team & team = team_node->value;
+		if (team.players.is_empty()) {
+			return StatusType::FAILURE;
+		}
         //todo: validate corrent complexity
         Node<PlayerLevel, Player*>** block_array =team.players.export_to_array();
-		for (int i=0; i< team.players_count;i++){
+		for (int i=0; i< team.players.size;i++){
             output[i] =  block_array[i]->value->id;
-        }
+		}
+		return StatusType::SUCCESS;
 	} else if (teamId < 0 && players_by_level.size == 0) {
 		return StatusType::FAILURE;
+	}
+	Node<PlayerLevel, Player*>** block_array =players_by_level.export_to_array();
+	for (int i=0; i< players_by_level.size;i++){
+		output[i] =  block_array[i]->value->id;
 	}
 	return StatusType::SUCCESS;
 }

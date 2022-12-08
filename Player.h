@@ -49,19 +49,19 @@ public:
             int downDelta = goals-next_down->goals;
             int upDelta = goals-next_up->goals;
             if (downDelta*downDelta<upDelta*upDelta) return next_down;
-            else return next_up;
+			if (downDelta*downDelta>upDelta*upDelta) return next_up;
         }
         if (next_down->cards!=next_up->cards) {
             int downDelta = cards-next_down->cards;
             int upDelta = cards-next_up->cards;
-            if (downDelta*downDelta>upDelta*upDelta) return next_down;
-            else return next_up;
+            if (downDelta*downDelta<upDelta*upDelta) return next_down;
+			if (downDelta*downDelta>upDelta*upDelta) return next_up;
         }
         if (next_down->id!=next_up->id) {
             int downDelta = id-next_down->id;
             int upDelta = id-next_up->id;
             if (downDelta*downDelta<upDelta*upDelta) return next_down;
-            else return next_up;
+            else if (downDelta*downDelta>upDelta*upDelta) return next_up;
         }
         if (next_down->id>next_up->id) return next_down;
         else return next_up;

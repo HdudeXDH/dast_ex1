@@ -344,13 +344,13 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     Node<PlayerLevel, Player*>** team1_array = team1->players.export_to_array();
 	Node<int, Player> * player75 = players_by_id.search(75);
     for (int i=0;i<team1->players_count;i++){
+		team1_array[i]->value->games_played+=team1->games_played-team1_array[i]->value->teams_matches_pre_arrival_count;
 		team1_array[i]->value->team = newteam;
-        team1_array[i]->value->games_played+=team1->games_played-team1_array[i]->value->teams_matches_pre_arrival_count;
     }
     Node<PlayerLevel, Player*>** team2_array = team2->players.export_to_array();
     for (int i=0;i<team2->players_count;i++){
+		team2_array[i]->value->games_played+=team2->games_played-team2_array[i]->value->teams_matches_pre_arrival_count;
 		team2_array[i]->value->team = newteam;
-        team2_array[i]->value->games_played+=team2->games_played-team2_array[i]->value->teams_matches_pre_arrival_count;
     }
     //merging the trees
     newteam->players.merge_trees(team1->players,team2->players);
@@ -359,6 +359,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     newteam->goal_keepers_count = team1->goal_keepers_count + team2->goal_keepers_count;
     newteam->power = team1->power + team2->power;
     newteam->points= team1->points+team2->points;
+	newteam->games_played = 0;
 //    bool was_team_legitimate_before_adding = team_to_add_player->is_legitimate_for_match();
 //    team_to_add_player->add_player_to_team(&new_player->value);
 //    if (team_to_add_player->is_legitimate_for_match() && !was_team_legitimate_before_adding) {

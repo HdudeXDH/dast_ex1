@@ -512,7 +512,9 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 	}
 	assert(playing_teams->size == 1);
 	int winner = playing_teams->head->next->key;
-	delete playing_teams;
+    delete playing_teams->head;
+    delete playing_teams->tail;
+    delete playing_teams;
 	return output_t<int>(winner);
     // if num players < num teams, get player list, and
     //todo: create "valid" teams

@@ -38,6 +38,17 @@ public:
 		head->prev = nullptr;
 		tail->next = nullptr;
 	};
+	~LinkedList() {
+		LinkedList_Node<K,V>* next = head->next;
+		LinkedList_Node<K,V>* nextnext = head->next->next;
+		while (nextnext != tail) {
+			delete next;
+			next = nextnext;
+			nextnext = next->next;
+		}
+		delete head;
+		delete tail;
+	}
 
 	// methods
 	void add(K key, V value);

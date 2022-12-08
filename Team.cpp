@@ -27,7 +27,7 @@ void Team::add_player_to_team(Player* player) {
 		top_scorrer = player;
 	}
     if ( *top_scorrer->level < *player->level){
-        bool doublecheck = *top_scorrer->level < *player->level;
+//        bool doublecheck = *top_scorrer->level < *player->level;
         top_scorrer = player;
     }
 }

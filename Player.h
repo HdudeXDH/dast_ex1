@@ -26,13 +26,13 @@ public:
 	int id;
 //	Team* team;
     Team* team;
-	PlayerLevel* level;
-	int cards;
 	int games_played;
-	bool is_goal_keeper;
 	int goals;
+	int cards;
+	bool is_goal_keeper;
 	int teams_matches_pre_arrival_count;
-    Player* next_up;
+	PlayerLevel* level;
+	Player* next_up;
     Player* next_down;
 
 
@@ -54,7 +54,7 @@ public:
         if (next_down->cards!=next_up->cards) {
             int downDelta = cards-next_down->cards;
             int upDelta = cards-next_up->cards;
-            if (downDelta*downDelta<upDelta*upDelta) return next_down;
+            if (downDelta*downDelta>upDelta*upDelta) return next_down;
             else return next_up;
         }
         if (next_down->id!=next_up->id) {

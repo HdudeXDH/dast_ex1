@@ -63,9 +63,9 @@ public:
 	AVLTree() : root(nullptr), size(0){};
     ~AVLTree(){
         if (root== nullptr) return;
-        int n = size;
+//        int n = size;
         int ix = 0;
-        Node<K, V> * allNodes[n];
+        Node<K, V> ** allNodes = new Node<K, V> *[size];
         Recursive_export_to_array(root,allNodes, &ix);
 //        std::cout<<ix<<", "<<n<<std::endl;
         for (int i =0; i<ix;i++){
@@ -139,7 +139,7 @@ Node<K,V>* AVLTree<K, V>::find_next_up(Node<K,V> * start){
         parent=current->parent;
     }
     return parent;
-};
+}
 //template <typename K,typename V>
 //Node<K,V>* AVLTree<K, V>::find_next_down(Node<K,V> * start){
 //    if (!start->is_leaf()){
@@ -163,7 +163,7 @@ void AVLTree<K, V>::update_parent(Node<K, V> *child,Node<K, V> *target){
     else {
         child->parent->left=target;
     }
-};
+}
 
 template <typename K,typename V>
 Node<K, V>* AVLTree<K, V>::search(const K & target_key, bool return_parent, Node<K, V> *start_node) {
@@ -259,7 +259,7 @@ void AVLTree<K,V>::rotate(Node<K,V>* dest){
         return RL_rotate(dest);
 
 
-};
+}
 
 template <typename K,typename V>
 Node<K,V>* AVLTree<K,V>::min( Node<K,V>* start) {
@@ -326,7 +326,7 @@ void AVLTree<K,V>::create_avl_from_array(Node<K, V>** array, int n){
         root->parent= nullptr;
     }
     size = n;
-};
+}
 
 // todo big big fucking problem
 template <typename K,typename V>
@@ -593,7 +593,7 @@ void AVLTree<K,V>::LL_rotate(Node<K,V>* b){
 
 //    // Return new root
 //    return x;
-};
+}
 template <typename K,typename V>
 void AVLTree<K,V>::RR_rotate(Node<K,V>* b){
 //    std::cout<<"RR_rotate ("<<b->key<<")"<<std::endl;
@@ -637,19 +637,19 @@ void AVLTree<K,V>::RR_rotate(Node<K,V>* b){
 //    y->height = max(get_height(y->left),
 //                    get_height(y->right)) + 1;
 
-};
+}
 
 template <typename K,typename V>
 void AVLTree<K,V>::RL_rotate(Node<K,V>* dest){
     LL_rotate(dest->right);
     RR_rotate(dest);
-};
+}
 
 template <typename K,typename V>
 void AVLTree<K,V>::LR_rotate(Node<K,V>* dest){
     RR_rotate(dest->left);
     LL_rotate(dest);
-};
+}
 
 template <typename K,typename V>
 Node<K, V>** AVLTree<K,V>::export_to_array() {
@@ -660,7 +660,7 @@ Node<K, V>** AVLTree<K,V>::export_to_array() {
 	Recursive_export_to_array(root, array, &index);
 	return array;
 
-};
+}
 template <typename K,typename V>
 void AVLTree<K,V>::Recursive_export_to_array(Node<K,V>* root, Node<K,V> **array, int *indexPtr){
 	// recursion Base
@@ -698,10 +698,11 @@ void AVLTree<K,V>::merge_trees(AVLTree<K,V> & tree1, AVLTree<K,V> & tree2) {
         tree2.root= nullptr;
         tree2.size=0;
     }
-    Node<K,V>* mergedArr[tree1_size + tree2_size];
+    Node<K,V>** mergedArr = new Node<K,V>*[tree1_size + tree2_size];
 	Node<K, V>** merged_array = merge_arrays(tree1_array, tree2_array, tree1_size, tree2_size,mergedArr);
 	create_avl_from_array(merged_array,tree1_size+tree2_size);
     this->size=tree1_size+tree2_size;
+	delete merged_array;
 }
 
 /**

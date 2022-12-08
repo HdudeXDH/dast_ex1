@@ -29,9 +29,9 @@ class LinkedList {
 public:
 	// members
 	// Head is dummy, does not have a value
+	int size;
 	LinkedList_Node<K,V>* head;
 	LinkedList_Node<K,V>* tail;
-	int size;
 
 	// Ctor & Dtor
 	LinkedList(): size(0), head(new LinkedList_Node<K,V>()), tail(head) {

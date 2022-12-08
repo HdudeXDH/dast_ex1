@@ -72,25 +72,11 @@ StatusType world_cup_t::remove_team(int teamId)
 
 void world_cup_t::renew_player_nextup_nextdown(Node<PlayerLevel, Player*> * new_player_by_level){
     Node<PlayerLevel, Player*> *nextup = players_by_level.find_next_up(new_player_by_level);
-//        printBT(players_by_id.root);
     Player* nextdown;
-    //todo: weird prints======= delete me
-//    if (nextup!=nullptr) std::cout <<new_player_by_level->value->id<<"("<<new_player_by_level->value->goals<<"), nextup:"<<nextup->value->id<<", goals:"<<nextup->value->goals<<std::endl;
-//    else{ std::cout <<new_player_by_level->value->id<<" - Big("<<new_player_by_level->value->goals<<")"<<std::endl;}
-//    if (top_scorrer!=nullptr) {std::cout <<"oldBig["<<top_scorrer->id<<"]"<<top_scorrer->goals<<std::endl;}
-//    if (playerId==187){
-//        Node <PlayerLevel, Player*> ** testArr =players_by_level.export_to_array();
-//        for (int i=0; i<players_by_level.size;i++){
-//            std::cout<<testArr[i]->value->id<<"("<<testArr[i]->value->goals<<","<<testArr[i]->value->cards<<")"<<std::endl;
-//        }
-////            res=  players_by_id.search(75);
-//
-//    }
-
-
     if (nextup== nullptr){
         nextdown = top_scorrer;
         top_scorrer=new_player_by_level->value;
+        new_player_by_level->value->next_down=nextdown;
     } else {
         nextdown = nextup->value->next_down;
         new_player_by_level->value->next_down=nextdown;
@@ -100,6 +86,8 @@ void world_cup_t::renew_player_nextup_nextdown(Node<PlayerLevel, Player*> * new_
     if (nextdown != nullptr){
         nextdown->next_up=new_player_by_level->value;
     }
+//    std::cout <<"--------------"<<std::endl;
+//    printScoreboard();
 }
 
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
@@ -221,9 +209,14 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
     }
     Player * player = &(player_node_in_id_tree->value);
     //update next_up & next down
+//    if (playerId==140){
+//        printScoreboard();
+//    }
     if (player->next_down != nullptr) {player->next_down->next_up = player->next_up;}
     if (player->next_up != nullptr) {player->next_up->next_down = player->next_down;}
-
+//    if (playerId==140){
+//        printScoreboard();
+//    }
     Team * team = player->team;
 //    int teamId = team->id;
 //    bool isGoalKeeper = player_node_in_id_tree->value.is_goal_keeper;
@@ -245,11 +238,20 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 	player->update_level();
 	try {
         Node<PlayerLevel, Player*> *new_player_by_level =players_by_level.add(*player->level, player);
+//        if (playerId==140){
+//            printScoreboard();
+//        }
         renew_player_nextup_nextdown(new_player_by_level);
+//        if (playerId==140){
+//            printScoreboard();
+//        }
 		team->add_player_to_team(player);
 	} catch (std::exception& err) {
 		return StatusType::ALLOCATION_ERROR;
 	}
+//    if (playerId==140){
+//        printScoreboard();
+//    }
 	return StatusType::SUCCESS;
 }
 
@@ -391,7 +393,16 @@ output_t<int> world_cup_t::get_top_scorer(int teamId)
 		if (team_node == nullptr) {
 			return output_t<int>(StatusType::FAILURE);
 		}
-//        Node<PlayerLevel, Player*> * m = team_node->value.players.max_node(); //todo: delete!! for testing only!
+
+//        if (teamId==95){
+//            Node <PlayerLevel, Player*> ** testArr =team_node->value.players.export_to_array();
+//            for (int i=0; i<team_node->value.players.size;i++){
+//                std::cout<<testArr[i]->value->id<<"("<<testArr[i]->value->goals<<","<<testArr[i]->value->cards<<")"<<std::endl;
+//            }
+//
+//
+//        }
+        Node<PlayerLevel, Player*> * m = team_node->value.players.max_node(); //todo: delete!! for testing only!
 		return team_node->value.top_scorrer->id;
 	} else {
 		return top_scorrer->id;
@@ -439,7 +450,23 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
 	}
 	return StatusType::SUCCESS;
 }
-
+void world_cup_t::printScoreboard() {
+    Node <PlayerLevel, Player*> ** testArr =players_by_level.export_to_array();
+    for (int i=0; i<players_by_level.size;i++){
+        std::cout<<testArr[i]->value->id<<"("<<testArr[i]->value->goals<<","<<testArr[i]->value->cards<<")";
+        if (testArr[i]->value->next_up == nullptr){
+            std::cout<<"[null]";
+        } else {
+            std::cout<<"["<<testArr[i]->value->next_up->id<<"]";
+        }
+        if (testArr[i]->value->next_down == nullptr){
+            std::cout<<"[null]";
+        } else {
+            std::cout<<"["<<testArr[i]->value->next_down->id<<"]";
+        }
+        std::cout<<std::endl;
+    }
+}
 output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 {
 	// TODO: what if invalid/doesnt Exist teamID/playerId?
@@ -451,17 +478,14 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
     if (player_node== nullptr){
         return StatusType::FAILURE;
     }
-//    Node <int, Player> * res;
-//    if (playerId==187){
-//        Node <PlayerLevel, Player*> ** testArr =players_by_level.export_to_array();
-//        for (int i=0; i<players_by_level.size;i++){
-//            std::cout<<testArr[i]->value->id<<"("<<testArr[i]->value->goals<<","<<testArr[i]->value->cards<<")"<<std::endl;
-//        }
+    Node <int, Player> * res;
+//    if (playerId==113){
+//        printScoreboard();
 //        res=  players_by_id.search(75);
 //
 //    }
 
-//    Node <PlayerLevel, Player*> * res2 = players_by_level.find_next_up(players_by_level.search(*player_node->value->level));
+    Node <PlayerLevel, Player*> * res2 = players_by_level.find_next_up(players_by_level.search(*player_node->value->level));
 
 
 

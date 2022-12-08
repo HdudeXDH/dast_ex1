@@ -271,9 +271,11 @@ Node<K,V>* AVLTree<K,V>::min( Node<K,V>* start) {
 
 template <typename K,typename V>
 Node<K,V>* AVLTree<K,V>::max_node( Node<K,V>* start) {
-	if (start == nullptr) {
+	if (root== nullptr){
+        return nullptr;
+    }
+    if (start == nullptr) {
 		start = root;
-        return start;
 	}
 	while (start->right != nullptr){
 		start = start->right;

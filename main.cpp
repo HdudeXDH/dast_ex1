@@ -13,20 +13,32 @@
 int main() {
 
     AVLTree<int,int> a;
-    a.add(1,2);
-    a.add(2,2);
-    a.add(3,2);
-    a.add(4,2);
+    Node<int,int>* a1 =  a.add(1,2);
+    printBT(a.root);
+    Node<int,int>* a2= a.add(2,2);
+    printBT(a.root);
+    Node<int,int>* a3 = a.add(3,2);
+    printBT(a.root);
+    Node<int,int>* a4=a.add(4,2);
+    printBT(a.root);
     a.add(5,2);
+    printBT(a.root);
+//    a.swap_nodes(a3,a1);
+    printBT(a.root);
     a.add(6,2);
+    printBT(a.root);
     a.add(7,2);
     a.add(8,2);
     a.add(9,2);
     a.add(10,2);
-    a.add(11,2);
-    a.add(12,2);
-    a.add(13,2);
+    Node<int,int>* a11= a.add(11,2);
+
+    Node<int,int>* a12 = a.add(12,2);
+    Node<int,int>* a13 =a.add(13,2);
     printBT(a.root);
+    a.remove_by_key(4);
+    printBT(a.root);
+    //todo: swap 11 and 12
     a.add(14,2);
     a.add(15,2);
     a.add(16,2);

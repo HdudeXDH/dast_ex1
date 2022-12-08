@@ -1,7 +1,7 @@
 #ifndef DAST_EX1_UTILS_H
 #define DAST_EX1_UTILS_H
 #include "AVLTree.h"
-
+#include <sstream>
 //class Utils {
 //public:
 //
@@ -11,7 +11,17 @@
 //    template <typename K,typename V>
 //    void printTree(AVLTree<K, V>* tree);
 //};
-
+//
+//std::string toString(int a){
+//    return std::to_string(a);
+//}
+//template <typename T>
+//std::string toString( const T& value )
+//{
+//    std::ostringstream ss;
+//    ss << value;
+//    return ss.str();
+//}
 //
 template <typename K,typename V>
 void printBT(const std::string& prefix, const Node<K,V> * node, bool isLeft)
@@ -26,7 +36,7 @@ void printBT(const std::string& prefix, const Node<K,V> * node, bool isLeft)
         // print the value of the node
         std::string parentkey = "None";
         if (node->parent!= nullptr){
-            parentkey = std::to_string(node->parent->key);
+            parentkey =  std::to_string(node->parent->key);
         }
         std::string leftkey = "None";
         if (node->left!= nullptr){
@@ -34,12 +44,14 @@ void printBT(const std::string& prefix, const Node<K,V> * node, bool isLeft)
         }
         std::string rightkey = "None";
         if (node->right!= nullptr){
-            rightkey = std::to_string(node->right->key);
+            rightkey =  std::to_string(node->right->key);
         }
         std::string height = "None";
-        height = std::to_string(node->height);
+        height =  std::to_string(node->height);
+        std::string mykey = "None";
+        mykey =  std::to_string(node->key);
 
-        std::cout <<"(" <<node->key<<",p:"<<parentkey<<",l:"<<leftkey<<",r:"<<rightkey<<",h:"<<height<<")" << std::endl;
+        std::cout <<"(" <<mykey<<",p:"<<parentkey<<",l:"<<leftkey<<",r:"<<rightkey<<",h:"<<height<<")" << std::endl;
 
         // enter the next tree level - left and right branch
         printBT( prefix + (isLeft ? "│   " : "    "), node->left, true);

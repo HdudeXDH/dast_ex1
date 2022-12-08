@@ -1,5 +1,5 @@
 #include "Player.h"
-
+#include <sstream>
 bool PlayerLevel::operator>(const PlayerLevel & otherlevel) {
 	if (this->goals == otherlevel.goals) {
 		if (this->cards == otherlevel.cards) {
@@ -28,6 +28,14 @@ void Player::update_level() {
 	level->cards = cards;
 	level->goals = goals;
 }
+
+//std::ostream &operator<<(std::ostream &os, PlayerLevel const &m) {
+//    return os << "LVL{"<<m.goals<<";"<<m.cards<<"}";
+//}
+//std::ostringstream &operator<<(std::ostringstream &os, PlayerLevel const &m) {
+//    return os << "LVL{"+std::to_string(m.goals)<<";"+std::to_string(m.cards)+"}";
+//}
+
 
 //int Player::get_total_games_played() {
 //	return (team->games_played + games_played);

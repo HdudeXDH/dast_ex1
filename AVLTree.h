@@ -5,8 +5,8 @@
 #include <exception>
 #include <memory>
 #include <iostream>
-//#include "tools.h"
-//#include "Utils.h"
+#include "tools.h"
+//#include "Utils.h" //todo: delete!
 //#define max(X, Y) (((X) > (Y)) ? (X) : (Y))
 
 //template <typename K, typename V>
@@ -35,7 +35,6 @@ public:
     int BF();
 //    bool operator==(const Node& node);
 //    bool operator>(const Node& node);
-    void print();
 };
 
 
@@ -53,17 +52,16 @@ private:
 	void LR_rotate(Node<K,V>* dest);
 	void replace( Node<K, V> *target, Node<K, V> *replace_by, bool remove = true);
 	void swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2);
-	void swap_nodes(Node<K, V> *node1, Node<K, V> *node2);
-
-
-
 public:
-	// members
+
+
+
+    // members
     Node<K, V> * root;
-	int size;
-	// constructor and destractor
+    int size;
+    // constructor and destractor
 	AVLTree() : root(nullptr), size(0){};
-	~AVLTree(){
+    ~AVLTree(){
         if (root== nullptr) return;
         int n = size;
         int ix = 0;
@@ -74,11 +72,12 @@ public:
             delete allNodes[i];
         }
     };
-
 	//basic methods
 	Node<K, V>* search(const K & target_key, bool return_parent= false, Node<K, V> *start_node = nullptr);
-	Node<K,V>* add(const K& key, const V& value );
-	Node<K,V>* remove_by_key(const K& key, Node<K, V> *start_node= nullptr);
+
+    void swap_nodes(Node<K, V> *node1, Node<K, V> *node2);
+    Node<K,V>* add(const K& key, const V& value );
+    Node<K,V>* remove_by_key(const K& key, Node<K, V> *start_node= nullptr);
 	Node<K,V>* remove_Node(Node<K, V>* to_remove, Node<K, V> *start_node= nullptr);
 //    Node<K,V>* remove_recursively(Node<K, V>* to_remove);
     Node<K,V>* max_node(Node<K,V>* start = nullptr);
@@ -312,6 +311,7 @@ Node<K,V>* AVLTree<K,V>::remove_by_key(const K& key, Node<K, V> *start_node){
             temp = temp->parent;
         }
     }
+//    printBT(root);
     return nullptr;
 }
 
@@ -358,59 +358,100 @@ void AVLTree<K,V>::swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2) {
 template<typename K, typename  V>
 void AVLTree<K,V>::swap_nodes(Node<K, V> *node1, Node<K, V> *node2) {
 	//handle root
+    if (node2 == root) {
+        swap_nodes(node2, node1);
+        return;
+    }
 	if (node1 == root) {
 		root = node2;
 	}
-	if (node2 == root) {
-		swap_nodes(node2, node1);
-	}
+
+    if (node2==node1->parent){
+        swap_nodes(node2, node1);
+        return;
+    }
+//return alon
 	Node<K,V> *temp_right_ptr, *temp_left_ptr, *temp_parent_ptr;
 	// set temp values for later
 	temp_left_ptr = node1->left;
 	temp_right_ptr = node1->right;
 	temp_parent_ptr = node1->parent;
+    int temp_height = node1->height;
+    node1->height =node2->height;
+    node2->height=temp_height;
+    if (node1==node2->parent){
+        if (temp_left_ptr==node2){
+            node1->right=node2->right;
+            node1->left=node2->left;
+            node2->right=temp_right_ptr;
+            node2->left=node1;
+            node2->parent=temp_parent_ptr;
+            node1->parent=node2;
+            if (temp_right_ptr != nullptr) {temp_right_ptr->parent=node2;}
+        } else {
+            node1->right=node2->right;
+            node1->left=node2->left;
+            node2->left=temp_left_ptr;
+            node2->right=node1;
+            node2->parent=temp_parent_ptr;
+            node1->parent=node2;
+            if (temp_left_ptr != nullptr) {temp_left_ptr->parent=node2;}
+        }
+        if (node1->left != nullptr) {node1->left->parent=node1;}
+        if (node1->right != nullptr) {node1->right->parent=node1;}
+        if (temp_parent_ptr != nullptr) {
+            if (temp_parent_ptr->right==node1) temp_parent_ptr->right=node2;
+            else  temp_parent_ptr->left=node2;
+        }
 
-	// set parent and sons for node1
-	node1->right = node2->right;
-	if (node2->right != nullptr) {
-		node1->right->parent = node1;
-	}
-	node1->left = node2->left;
-	if (node2->left != nullptr) {
-		node1->left->parent = node1;
-	}
-	node1->parent = node2->parent;
-	if (node2->parent != nullptr) {
-		if (node2->parent->right == node2) {
-			node1->parent->right = node1;
-		} else {
-			node1->parent->left = node1;
-		}
-	}
+    } else {
+        // set parent and sons for node1
+        node1->right = node2->right;
+        if (node2->right != nullptr) {
+            node1->right->parent = node1;
+        }
+        node1->left = node2->left;
+        if (node2->left != nullptr) {
+            node1->left->parent = node1;
+        }
+        node1->parent = node2->parent;
+        if (node2->parent != nullptr) {
+            if (node2->parent->right == node2) {
+                node2->parent->right = node1;
+            } else {
+                node2->parent->left = node1;
+            }
+        }
 
-	// set parent and sons for node2
-	node2->right = temp_right_ptr;
-	if (temp_right_ptr != nullptr) {
-		temp_right_ptr->parent = node2;
-	}
-	node2->left = temp_left_ptr;
-	if (temp_left_ptr != nullptr) {
-		temp_left_ptr->parent = node2;
-	}
-	node2->parent = temp_parent_ptr;
-	if (temp_left_ptr != nullptr) {
-		if (temp_left_ptr->right == node2) {
-			temp_left_ptr->right = node2;
-		} else {
-			node1->parent->left = node2;
-		}
-	}
+        // set parent and sons for node2
+        node2->right = temp_right_ptr;
+        if (temp_right_ptr != nullptr) {
+            temp_right_ptr->parent = node2;
+        }
+        node2->left = temp_left_ptr;
+        if (temp_left_ptr != nullptr) {
+            temp_left_ptr->parent = node2;
+        }
+        node2->parent = temp_parent_ptr;
+        if (temp_parent_ptr != nullptr) {
+            if (temp_parent_ptr->right == node1) {
+                temp_parent_ptr->right = node2;
+            } else {
+                temp_parent_ptr->left = node2;
+            }
+        }
+    }
+
+
 }
 template<typename K, typename  V>
 Node<K,V>* AVLTree<K,V>::remove_leaf(Node<K, V> *leaf_to_remove){
 	assert(leaf_to_remove->right == nullptr && leaf_to_remove->left == nullptr);
 	Node<K,V> *parent = leaf_to_remove->parent;
-	if (parent->left == leaf_to_remove) {
+    if (leaf_to_remove==root){
+        root= nullptr;
+    }
+	else if (parent->left == leaf_to_remove) {
 		parent->left = nullptr;
 	} else {
 		assert(parent->right == leaf_to_remove);

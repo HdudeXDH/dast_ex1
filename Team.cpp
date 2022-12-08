@@ -11,6 +11,9 @@ Team::Team(int id, int points): id(id), points(points), top_scorrer(nullptr), pl
 }
 
 void Team::add_player_to_team(Player* player) {
+//    if (id == 20){
+//        printBT(players.root);
+//    }
 	assert(player != nullptr);
 	players.add(*player->level, player);
     players_by_id.add(player->id, player);
@@ -20,9 +23,13 @@ void Team::add_player_to_team(Player* player) {
 	}
 	int add_to_power = (player->goals - player->cards);
 	this->power = this->power + add_to_power;
-	if (top_scorrer == nullptr || top_scorrer->level < player->level) {
+	if (top_scorrer == nullptr) {
 		top_scorrer = player;
 	}
+    if ( *top_scorrer->level < *player->level){
+        bool doublecheck = *top_scorrer->level < *player->level;
+        top_scorrer = player;
+    }
 }
 
 void Team::remove_player_from_team(Player* player) {

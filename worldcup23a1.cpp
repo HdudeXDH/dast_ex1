@@ -197,7 +197,11 @@ StatusType world_cup_t::remove_player(int playerId)
 		}
 		//delete player
 //		delete player_to_remove;
-		top_scorrer = players_by_level.max_node()->value;
+        Node<PlayerLevel,Player*> *new_top_scorrer = players_by_level.max_node();
+        if (new_top_scorrer == nullptr){
+            top_scorrer= nullptr;
+        }
+		else {top_scorrer = players_by_level.max_node()->value;}
 	} catch (std::exception& err) {
 		return StatusType::ALLOCATION_ERROR;
 	}

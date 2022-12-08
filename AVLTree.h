@@ -273,6 +273,7 @@ template <typename K,typename V>
 Node<K,V>* AVLTree<K,V>::max_node( Node<K,V>* start) {
 	if (start == nullptr) {
 		start = root;
+        return start;
 	}
 	while (start->right != nullptr){
 		start = start->right;
@@ -319,6 +320,9 @@ template <typename K,typename V>
 void AVLTree<K,V>::create_avl_from_array(Node<K, V>** array, int n){
 //    if (!this->is_empty()){throw AVLTree<K,V>::AVLTreeNotEmpty();}
     root = sortedArrayToBST(array, 0, n-1); //todo maybe should be n-1
+    if (root != nullptr){
+        root->parent= nullptr;
+    }
     size = n;
 };
 

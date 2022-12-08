@@ -322,7 +322,7 @@ Node<K,V>* AVLTree<K,V>::remove_by_key(const K& key, Node<K, V> *start_node){
 template <typename K,typename V>
 void AVLTree<K,V>::create_avl_from_array(Node<K, V>** array, int n){
 //    if (!this->is_empty()){throw AVLTree<K,V>::AVLTreeNotEmpty();}
-    root = sortedArrayToBST(array, 0, n-1); //todo maybe should be n-1
+    root = sortedArrayToBST(array, 0, n-1);
     if (root != nullptr){
         root->parent= nullptr;
     }

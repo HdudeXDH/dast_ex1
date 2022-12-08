@@ -468,14 +468,14 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 	if (legitimate_teams.size == 0) {
 		return output_t<int>(StatusType::FAILURE);
 	}
-	LinkedList<int, int> *playing_teams;
+//	playing_teams;
 //    int ix=0; // bad example minTeamId = 3, max = 19
 //    Node<int, Team> * deleteme[teams.size];
 //    teams.Recursive_export_to_array(teams.root, deleteme,&ix);
 //    int ix2=0;
 //    Node<int, Team*> * deleteme2[legitimate_teams.size];
 //    legitimate_teams.Recursive_export_to_array(legitimate_teams.root, deleteme2,&ix2);
-    playing_teams = export_lagitimate_teams_to_list(minTeamId, maxTeamId);
+    LinkedList<int, int> * playing_teams = export_lagitimate_teams_to_list(minTeamId, maxTeamId);
 	if (playing_teams->size <= 0) {
 		return output_t<int>(StatusType::FAILURE);
 	}
@@ -514,7 +514,9 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 	int winner = playing_teams->head->next->key;
 //    delete  playing_teams->head->next;
 //    delete playing_teams->tail->next;
+//    delete playing_teams->head->next;
     delete playing_teams->head;
+
     delete playing_teams->tail;
     delete playing_teams;
 	return output_t<int>(winner);

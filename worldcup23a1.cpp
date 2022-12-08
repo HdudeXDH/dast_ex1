@@ -522,35 +522,52 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 
 LinkedList<int, int>* world_cup_t::export_lagitimate_teams_to_list(int minTeamId, int maxTeamId) {
 	LinkedList<int, int>* playing_teams = new LinkedList<int, int>();
-    int ix2=0;
-    Node<int, Team*> * raw_array[legitimate_teams.size];
-    legitimate_teams.Recursive_export_to_array(legitimate_teams.root, raw_array,&ix2);
-    for (int i=0;i<ix2;i++){
-        if ((raw_array[i]->key <=maxTeamId)&&(raw_array[i]->key >=minTeamId)){
-            playing_teams->add(raw_array[i]->key, raw_array[i]->value->get_overall_score());
-        }
+//    int ix2=0;
+//    Node<int, Team*> * raw_array[legitimate_teams.size];
+	Recursive_export_legitimate_teams_to_list(legitimate_teams.root, playing_teams,minTeamId, maxTeamId);
+//    for (int i=0;i<ix2;i++){
+//        if ((raw_array[i]->key <=maxTeamId)&&(raw_array[i]->key >=minTeamId)){
+//            playing_teams->add(raw_array[i]->key, raw_array[i]->value->get_overall_score());
+//        }
 
-    }
+//    }
 //	recursive_export_to_list(minTeamId, maxTeamId, legitimate_teams.root, playing_teams);
 	return playing_teams;
 }
 
-void world_cup_t::recursive_export_to_list(int minTeamId, int maxTeamId, Node<int, Team*>* start, LinkedList<int, int>* list) {
-	int key = start->key;
-	if ( key < minTeamId ) {
-		if (start->right == nullptr) {
-			return ;
+
+void world_cup_t::Recursive_export_legitimate_teams_to_list(Node<int, Team*>* root, LinkedList<int, int>* list, int minId, int maxId) {
+	if (root->key > minId) {
+		if (root->left != nullptr) {
+			Recursive_export_legitimate_teams_to_list(root->left, list, minId, maxId);
 		}
-		recursive_export_to_list(minTeamId, maxTeamId, start->right, list);
 	}
-	if (key >= minTeamId && key <= maxTeamId) {
-		int score = start->value->get_overall_score();
-		list->add(key, score);
+	if (root->key <= maxId && root->key >= minId) {
+		list->add(root->key, root->value->get_overall_score());
 	}
-	if (key  > maxTeamId) {
-		if (start->left == nullptr) {
-			return ;
+	if (root->key < maxId) {
+		if (root->right != nullptr) {
+			Recursive_export_legitimate_teams_to_list(root->right, list, minId, maxId);
 		}
-		recursive_export_to_list(minTeamId, maxTeamId, start->left, list);
 	}
 }
+
+//void world_cup_t::recursive_export_to_list(int minTeamId, int maxTeamId, Node<int, Team*>* start, LinkedList<int, int>* list) {
+//	int key = start->key;
+//	if ( key < minTeamId ) {
+//		if (start->right == nullptr) {
+//			return ;
+//		}
+//		recursive_export_to_list(minTeamId, maxTeamId, start->right, list);
+//	}
+//	if (key >= minTeamId && key <= maxTeamId) {
+//		int score = start->value->get_overall_score();
+//		list->add(key, score);
+//	}
+//	if (key  > maxTeamId) {
+//		if (start->left == nullptr) {
+//			return ;
+//		}
+//		recursive_export_to_list(minTeamId, maxTeamId, start->left, list);
+//	}
+//}

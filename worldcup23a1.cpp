@@ -174,13 +174,20 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
     if (player->next_up != nullptr) {player->next_up->next_down = player->next_down;}
 
     Team * team = player->team;
-	try {
-		players_by_level.remove_by_key(*player->level);
-	} catch (std::exception& err) {
-		return StatusType::ALLOCATION_ERROR;
-	}
+//    int teamId = team->id;
+//    bool isGoalKeeper = player_node_in_id_tree->value.is_goal_keeper;
+//    int newgameplayed = (player->games_played + gamesPlayed);
+//    int newgoals = (player->goals + scoredGoals);
+//	int newcards = (player->cards + cardsReceived);
+//    remove_player(playerId);
+//    add_player(playerId,teamId,newgameplayed,newgoals,newcards,isGoalKeeper);
 	// remove (in order to add)
 	team->remove_player_from_team(player);
+    try {
+        players_by_level.remove_by_key(*player->level);
+    } catch (std::exception& err) {
+        return StatusType::ALLOCATION_ERROR;
+    }
 	player->games_played = (player->games_played + gamesPlayed);
 	player->goals = (player->goals + scoredGoals);
 	player->cards = (player->cards + cardsReceived);
@@ -318,6 +325,7 @@ output_t<int> world_cup_t::get_top_scorer(int teamId)
 		if (team_node == nullptr) {
 			return output_t<int>(StatusType::FAILURE);
 		}
+        Node<PlayerLevel, Player*> * m = team_node->value.players.max_node(); //todo: delete!! for testing only!
 		return team_node->value.top_scorrer->id;
 	} else {
 		return top_scorrer->id;
@@ -378,14 +386,14 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
         return StatusType::FAILURE;
     }
     Node <int, Player> * res;
-    if (playerId==173){
-        Node <PlayerLevel, Player*> ** testArr =players_by_level.export_to_array();
-        for (int i=0; i<players_by_level.size;i++){
-//            std::cout<<testArr[i]->value->id<<"("<<testArr[i]->value->goals<<","<<testArr[i]->value->cards<<")"<<std::endl;
-        }
-        res=  players_by_id.search(75);
-
-    }
+//    if (playerId==173){
+//        Node <PlayerLevel, Player*> ** testArr =players_by_level.export_to_array();
+//        for (int i=0; i<players_by_level.size;i++){
+////            std::cout<<testArr[i]->value->id<<"("<<testArr[i]->value->goals<<","<<testArr[i]->value->cards<<")"<<std::endl;
+//        }
+//        res=  players_by_id.search(75);
+//
+//    }
 
     Node <PlayerLevel, Player*> * res2 = players_by_level.find_next_up(players_by_level.search(*player_node->value->level));
 

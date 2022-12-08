@@ -36,7 +36,7 @@ int main() {
     Node<int,int>* a12 = a.add(12,2);
     Node<int,int>* a13 =a.add(13,2);
     printBT(a.root);
-    a.remove_by_key(4);
+    a.remove_by_key(10);
     printBT(a.root);
     //todo: swap 11 and 12
     a.add(14,2);
@@ -52,9 +52,35 @@ int main() {
     a.add(24,2);
     a.add(25,2);
     a.add(26,2);
+
+    a.remove_by_key(3);
     a.add(27,2);
     a.add(28,2);
     a.add(29,2);
+    a.add(30,2);
+    a.add(31,2);
+    printBT(a.root);
+    a.remove_by_key(16);
+    printBT(a.root);
+    a.remove_by_key(17);
+    printBT(a.root);
+    a.add(32,2);
+    a.add(33,2);
+    a.add(34,2);
+    a.add(35,2);
+    a.add(36,2);
+    a.add(37,2);
+    a.add(38,2);
+    a.add(39,2);
+    a.add(40,2);
+    a.add(41,2);
+    a.add(42,2);
+    printBT(a.root);
+    a.remove_by_key(33);
+
+
+
+    printBT(a.root);
 ////	a.remove_by_key(2);
 //    a.add(-1,2);
 //    int ix = 0;

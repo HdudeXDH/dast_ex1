@@ -5,8 +5,8 @@
 #include <exception>
 #include <memory>
 #include <iostream>
-//#include "tools.h"
-//#include "Utils.h"
+#include "tools.h"
+//#include "Utils.h" //todo: delete!
 //#define max(X, Y) (((X) > (Y)) ? (X) : (Y))
 
 //template <typename K, typename V>
@@ -35,7 +35,6 @@ public:
     int BF();
 //    bool operator==(const Node& node);
 //    bool operator>(const Node& node);
-    void print();
 };
 
 
@@ -312,6 +311,7 @@ Node<K,V>* AVLTree<K,V>::remove_by_key(const K& key, Node<K, V> *start_node){
             temp = temp->parent;
         }
     }
+//    printBT(root);
     return nullptr;
 }
 
@@ -358,13 +358,14 @@ void AVLTree<K,V>::swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2) {
 template<typename K, typename  V>
 void AVLTree<K,V>::swap_nodes(Node<K, V> *node1, Node<K, V> *node2) {
 	//handle root
+    if (node2 == root) {
+        swap_nodes(node2, node1);
+        return;
+    }
 	if (node1 == root) {
 		root = node2;
 	}
-	if (node2 == root) {
-		swap_nodes(node2, node1);
-        return;
-	}
+
     if (node2==node1->parent){
         swap_nodes(node2, node1);
         return;
@@ -433,7 +434,7 @@ void AVLTree<K,V>::swap_nodes(Node<K, V> *node1, Node<K, V> *node2) {
         }
         node2->parent = temp_parent_ptr;
         if (temp_parent_ptr != nullptr) {
-            if (temp_parent_ptr->right == node2) {
+            if (temp_parent_ptr->right == node1) {
                 temp_parent_ptr->right = node2;
             } else {
                 temp_parent_ptr->left = node2;
@@ -447,7 +448,10 @@ template<typename K, typename  V>
 Node<K,V>* AVLTree<K,V>::remove_leaf(Node<K, V> *leaf_to_remove){
 	assert(leaf_to_remove->right == nullptr && leaf_to_remove->left == nullptr);
 	Node<K,V> *parent = leaf_to_remove->parent;
-	if (parent->left == leaf_to_remove) {
+    if (leaf_to_remove==root){
+        root= nullptr;
+    }
+	else if (parent->left == leaf_to_remove) {
 		parent->left = nullptr;
 	} else {
 		assert(parent->right == leaf_to_remove);

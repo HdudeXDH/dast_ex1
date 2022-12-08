@@ -106,46 +106,11 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 	}
 	Team *team_to_add_player = &team_search_result->value;
 	try {
-		// after discussion - use regular ptrs here
-//		Player* new_player = new Player(playerId,team_search_result, gamesPlayed, goals, cards, goalKeeper);
-        Node<int, Player> *new_player = players_by_id.add(playerId, Player(playerId,&team_search_result->value, gamesPlayed, goals, cards, goalKeeper));
+		Player* player = new Player(playerId,&team_search_result->value, gamesPlayed, goals, cards, goalKeeper);
+        Node<int, Player> *new_player = players_by_id.add(playerId, *player);
+		delete player;
         Node<PlayerLevel, Player*> *new_player_by_level = players_by_level.add(*new_player->value.level, &new_player->value);
         renew_player_nextup_nextdown(new_player_by_level);
-        //        Node<PlayerLevel, Player*> *nextup = players_by_level.find_next_up(new_player_by_level);
-////        printBT(players_by_id.root);
-//        Player* nextdown;
-//        //todo: weird prints======= delete me
-//        if (nextup!=nullptr) std::cout <<new_player_by_level->value->id<<"("<<new_player_by_level->value->goals<<"), nextup:"<<nextup->value->id<<", goals:"<<nextup->value->goals<<std::endl;
-//        else{ std::cout <<new_player_by_level->value->id<<" - Big("<<new_player_by_level->value->goals<<")"<<std::endl;}
-//        if (top_scorrer!=nullptr) {std::cout <<"oldBig["<<top_scorrer->id<<"]"<<top_scorrer->goals<<std::endl;}
-//        if (playerId==187){
-//            Node <PlayerLevel, Player*> ** testArr =players_by_level.export_to_array();
-//            for (int i=0; i<players_by_level.size;i++){
-//                std::cout<<testArr[i]->value->id<<"("<<testArr[i]->value->goals<<","<<testArr[i]->value->cards<<")"<<std::endl;
-//            }
-////            res=  players_by_id.search(75);
-//
-//        }
-//
-//
-//        if (nextup== nullptr){
-//            nextdown = top_scorrer;
-//            top_scorrer=new_player_by_level->value;
-//        } else {
-//            nextdown = nextup->value->next_down;
-//            new_player_by_level->value->next_down=nextdown;
-//            nextup->value->next_down=new_player_by_level->value;
-//            new_player_by_level->value->next_up=nextup->value;
-//        }
-//        if (nextdown != nullptr){
-//            nextdown->next_up=new_player_by_level->value;
-//        }
-         // nextdown.nextup=current
-         // current.nextdown=nextdown
-        //nextup.nextdown = current
-        //current.nextup=nextup
-
-
 		bool was_team_legitimate_before_adding = team_to_add_player->is_legitimate_for_match();
 		team_to_add_player->add_player_to_team(&new_player->value);
 		if (team_to_add_player->is_legitimate_for_match() && !was_team_legitimate_before_adding) {
@@ -543,7 +508,9 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 		first_team = playing_teams->head->next;
 	}
 	assert(playing_teams->size == 1);
-	return output_t<int>(playing_teams->head->next->key);
+	int winner = playing_teams->head->next->key;
+	delete playing_teams;
+	return output_t<int>(winner);
     // if num players < num teams, get player list, and
     //todo: create "valid" teams
     //teams.Recursive_export_to_array()

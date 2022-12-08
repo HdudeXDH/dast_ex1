@@ -68,9 +68,10 @@ public:
         Node<K, V> ** allNodes = new Node<K, V> *[size];
         Recursive_export_to_array(root,allNodes, &ix);
 //        std::cout<<ix<<", "<<n<<std::endl;
-        for (int i =0; i<ix;i++){
-            delete allNodes[i];
-        }
+//        for (int i =0; i<ix;i++){
+//            delete allNodes[i];
+//        }
+		delete[] allNodes;
     };
 	//basic methods
 	Node<K, V>* search(const K & target_key, bool return_parent= false, Node<K, V> *start_node = nullptr);
@@ -463,6 +464,7 @@ Node<K,V>* AVLTree<K,V>::remove_leaf(Node<K, V> *leaf_to_remove){
 		assert(parent->right == leaf_to_remove);
 		parent->right = nullptr;
 	}
+//	delete leaf_to_remove->value;
 	delete leaf_to_remove;
     return parent;
 }
@@ -702,7 +704,9 @@ void AVLTree<K,V>::merge_trees(AVLTree<K,V> & tree1, AVLTree<K,V> & tree2) {
 	Node<K, V>** merged_array = merge_arrays(tree1_array, tree2_array, tree1_size, tree2_size,mergedArr);
 	create_avl_from_array(merged_array,tree1_size+tree2_size);
     this->size=tree1_size+tree2_size;
-	delete merged_array;
+	delete[] merged_array;
+	delete[] tree1_array;
+	delete[] tree2_array;
 }
 
 /**

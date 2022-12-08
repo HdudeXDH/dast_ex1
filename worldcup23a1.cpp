@@ -320,7 +320,7 @@ output_t<int> world_cup_t::get_team_points(int teamId)
 StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 {
 	// team search and validation
-    if (teamId1==teamId2) return StatusType::INVALID_INPUT;
+    if (teamId1==teamId2 || newTeamId <= 0 || teamId2 <= 0 || teamId1 <= 0) return StatusType::INVALID_INPUT;
     Node <int, Team> * team1_node = teams.search(teamId1);
     Node <int, Team> * team2_node = teams.search(teamId2);
     if (team1_node == nullptr || team2_node == nullptr) {
@@ -496,6 +496,9 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 {
 	if (minTeamId < 0 || maxTeamId < 0 || minTeamId > maxTeamId) {
 		return output_t<int>(StatusType::INVALID_INPUT);
+	}
+	if (legitimate_teams.size == 0) {
+		return output_t<int>(StatusType::FAILURE);
 	}
 	LinkedList<int, int> *playing_teams;
 //    int ix=0; // bad example minTeamId = 3, max = 19

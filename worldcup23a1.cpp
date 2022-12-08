@@ -345,6 +345,8 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         teams.remove_by_key(teamId2);
     }
 //    newteam->validate_sizes();
+    delete[] team2_array;
+    delete[] team1_array;
 	return StatusType::SUCCESS;
 }
 
@@ -411,6 +413,7 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
 		for (int i=0; i< team.players.size;i++){
             output[i] =  block_array[i]->value->id;
 		}
+        delete [] block_array;
 		return StatusType::SUCCESS;
 	} else if (teamId < 0 && players_by_level.size == 0) {
 		return StatusType::FAILURE;

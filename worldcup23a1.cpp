@@ -59,7 +59,7 @@ StatusType world_cup_t::remove_team(int teamId)
 	}
 	try {
 		teams.remove_by_key(teamId);
-        legitimate_teams.remove_by_key(teamId);
+//        legitimate_teams.remove_by_key(teamId);
 
 //		delete team_to_remove;
 	}

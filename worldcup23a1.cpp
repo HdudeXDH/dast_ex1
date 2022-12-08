@@ -333,6 +333,9 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     Team * newteam = &(newteam_node->value);
     Team * team1 = &(team1_node->value);
     Team * team2 = &(team2_node->value);
+    if (team1->is_legitimate_for_match()) legitimate_teams.remove_by_key(teamId1);
+    if (team2->is_legitimate_for_match()) legitimate_teams.remove_by_key(teamId2);
+
     //todo: update all players
     Node<PlayerLevel, Player*>** team1_array = team1->players.export_to_array();
 	Node<int, Player> * player75 = players_by_id.search(75);
@@ -351,6 +354,13 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     newteam->players_count = team1->players_count + team2->players_count;
     newteam->goal_keepers_count = team1->goal_keepers_count + team2->goal_keepers_count;
     newteam->power = team1->power + team2->power;
+//    bool was_team_legitimate_before_adding = team_to_add_player->is_legitimate_for_match();
+//    team_to_add_player->add_player_to_team(&new_player->value);
+//    if (team_to_add_player->is_legitimate_for_match() && !was_team_legitimate_before_adding) {
+//        legitimate_teams.add(teamId, team_to_add_player);
+//    }
+    //return alon
+    if (newteam->is_legitimate_for_match()) legitimate_teams.add(newTeamId, newteam);
 
     if (*team1->top_scorrer->level>*team2->top_scorrer->level) {newteam->top_scorrer= team1->top_scorrer;}
     else {newteam->top_scorrer= team2->top_scorrer;}

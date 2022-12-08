@@ -354,6 +354,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     newteam->players_count = team1->players_count + team2->players_count;
     newteam->goal_keepers_count = team1->goal_keepers_count + team2->goal_keepers_count;
     newteam->power = team1->power + team2->power;
+    newteam->points= team1->points+team2->points;
 //    bool was_team_legitimate_before_adding = team_to_add_player->is_legitimate_for_match();
 //    team_to_add_player->add_player_to_team(&new_player->value);
 //    if (team_to_add_player->is_legitimate_for_match() && !was_team_legitimate_before_adding) {
@@ -468,7 +469,7 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 		return output_t<int>(StatusType::INVALID_INPUT);
 	}
 	LinkedList<int, int> *playing_teams;
-//    int ix=0;
+//    int ix=0; // bad example minTeamId = 3, max = 19
 //    Node<int, Team> * deleteme[teams.size];
 //    teams.Recursive_export_to_array(teams.root, deleteme,&ix);
 //    int ix2=0;
@@ -486,16 +487,27 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
             second_team = first_team->next;
 			new_value = first_team->value + second_team->value + POINTS_TO_ADD;
             next_pair = second_team->next;
+//            if (minTeamId==3&&maxTeamId==19){
+//                std::cout<<"[<"<<first_team->key<<","<<first_team->value<<">,<"<<second_team->key<<","<<second_team->value<<">]";
+//            }
 			if(first_team->value < second_team->value || (first_team->value == second_team->value && first_team->key < second_team->key)) {
                 second_team->value = new_value;
                 playing_teams->remove_node(first_team);
+//                if (minTeamId==3&&maxTeamId==19){
+//                    std::cout<<"("<<second_team->key<<","<<second_team->value<<")";
+//                }
+
 			} else {
                 first_team->value = new_value;
                 playing_teams->remove_node(second_team);
+//                std::cout<<"("<<first_team->key<<","<<first_team->value<<")";
             }
             first_team = next_pair;
 
 		}
+//        if (minTeamId==3&&maxTeamId==19){
+//            std::cout<<"  | end round!---------"<<std::endl;
+//        }
 		first_team = playing_teams->head->next;
 	}
 	assert(playing_teams->size == 1);

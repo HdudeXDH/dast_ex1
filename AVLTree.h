@@ -68,9 +68,9 @@ public:
         Node<K, V> ** allNodes = new Node<K, V> *[size];
         Recursive_export_to_array(root,allNodes, &ix);
 //        std::cout<<ix<<", "<<n<<std::endl;
-//        for (int i =0; i<ix;i++){
-//            delete allNodes[i];
-//        }
+        for (int i =0; i<ix;i++){
+            delete allNodes[i];
+        }
 		delete[] allNodes;
     };
 	//basic methods

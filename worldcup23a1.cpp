@@ -109,7 +109,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 		Player* player = new Player(playerId,&team_search_result->value, gamesPlayed, goals, cards, goalKeeper);
         Node<int, Player> *new_player = players_by_id.add(playerId, *player);
 		delete player;
-        Node<PlayerLevel, Player*> *new_player_by_level = players_by_level.add(*new_player->value.level, &new_player->value);
+        Node<PlayerLevel, Player*> *new_player_by_level = players_by_level.add(new_player->value.level, &new_player->value);
         renew_player_nextup_nextdown(new_player_by_level);
 		bool was_team_legitimate_before_adding = team_to_add_player->is_legitimate_for_match();
 		team_to_add_player->add_player_to_team(&new_player->value);
@@ -137,7 +137,7 @@ StatusType world_cup_t::remove_player(int playerId)
 	}
 	Player *player_to_remove = &player_node_in_id_tree->value;
 	Team *players_team = player_to_remove->team;
-	PlayerLevel  level = *player_to_remove->level;
+	PlayerLevel  level = player_to_remove->level;
 	Node<PlayerLevel, Player*> *player_node_in_level_tree = players_by_level.search(level);
 	try {
 		// remove player from all AVL trees
@@ -195,7 +195,7 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 	// remove (in order to add)
 	team->remove_player_from_team(player);
     try {
-        players_by_level.remove_by_key(*player->level);
+        players_by_level.remove_by_key(player->level);
     } catch (std::exception& err) {
         return StatusType::ALLOCATION_ERROR;
     }
@@ -204,7 +204,7 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 	player->cards = (player->cards + cardsReceived);
 	player->update_level();
 	try {
-        Node<PlayerLevel, Player*> *new_player_by_level =players_by_level.add(*player->level, player);
+        Node<PlayerLevel, Player*> *new_player_by_level =players_by_level.add(player->level, player);
 //        if (playerId==140){
 //            printScoreboard();
 //        }
@@ -336,7 +336,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     //return alon
     if (newteam->is_legitimate_for_match()) legitimate_teams.add(newTeamId, newteam);
 
-    if (*team1->top_scorrer->level>*team2->top_scorrer->level) {newteam->top_scorrer= team1->top_scorrer;}
+    if (team1->top_scorrer->level>team2->top_scorrer->level) {newteam->top_scorrer= team1->top_scorrer;}
     else {newteam->top_scorrer= team2->top_scorrer;}
     if (teamId1!=newTeamId){
         teams.remove_by_key(teamId1);
@@ -512,6 +512,8 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 	}
 	assert(playing_teams->size == 1);
 	int winner = playing_teams->head->next->key;
+//    delete  playing_teams->head->next;
+//    delete playing_teams->tail->next;
     delete playing_teams->head;
     delete playing_teams->tail;
     delete playing_teams;

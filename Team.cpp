@@ -15,7 +15,7 @@ void Team::add_player_to_team(Player* player) {
 //        printBT(players.root);
 //    }
 	assert(player != nullptr);
-	players.add(*player->level, player);
+	players.add(player->level, player);
     players_by_id.add(player->id, player);
 	players_count = players_count + 1;
 	if (player->is_goal_keeper) {
@@ -26,7 +26,7 @@ void Team::add_player_to_team(Player* player) {
 	if (top_scorrer == nullptr) {
 		top_scorrer = player;
 	}
-    if ( *top_scorrer->level < *player->level){
+    if ( top_scorrer->level < player->level){
 //        bool doublecheck = *top_scorrer->level < *player->level;
         top_scorrer = player;
     }
@@ -34,7 +34,7 @@ void Team::add_player_to_team(Player* player) {
 
 void Team::remove_player_from_team(Player* player) {
 	assert(player != nullptr);
-	players.remove_by_key(*player->level);
+	players.remove_by_key(player->level);
     players_by_id.remove_by_key(player->id);
 	players_count = players_count - 1;
 	if (player->is_goal_keeper) {
@@ -77,9 +77,10 @@ int Player::get_total_games_played() {
 
 
 Player::Player(int playerId, Team* team, int gamesPlayed, int goals, int cards, bool goalKeeper):
-        id(playerId), team(team), games_played(gamesPlayed), goals(goals), cards(cards), is_goal_keeper(goalKeeper), next_up(nullptr), next_down(
+        id(playerId), team(team), games_played(gamesPlayed), goals(goals), cards(cards), is_goal_keeper(goalKeeper),
+        level(PlayerLevel(goals, cards, playerId)), next_up(nullptr), next_down(
         nullptr) {
-    level = new PlayerLevel(goals, cards, playerId);
+//    level = PlayerLevel(goals, cards, playerId);
     teams_matches_pre_arrival_count=team->games_played;
 }
 //void Team::update_team_stats(int playerId, int gamesPlayed, int scoredGoals, int cardsReceived) {

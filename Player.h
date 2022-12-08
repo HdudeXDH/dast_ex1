@@ -31,7 +31,7 @@ public:
 	int cards;
 	bool is_goal_keeper;
 	int teams_matches_pre_arrival_count;
-	PlayerLevel* level;
+	PlayerLevel level;
 	Player* next_up;
     Player* next_down;
 
@@ -39,7 +39,7 @@ public:
 	Player()= delete;
 	Player(int playerId, Team* team, int gamesPlayed, int goals, int cards, bool goalKeeper);
     ~Player() {
-        delete level;
+//        delete level;
 //        std::cout<<"Player["<<id<<"] dtor"<<std::endl;
     };
 	void update_level();

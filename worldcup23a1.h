@@ -36,6 +36,7 @@ private:
 
 	// methods
 	LinkedList<int, int>* export_lagitimate_teams_to_list(int minTeamId, int maxTeamId);
+    void renew_player_nextup_nextdown(Node<PlayerLevel, Player*> * player_node);
 	void recursive_export_to_list(int minTeamId, int maxTeamId, Node<int, Team*>* start, LinkedList<int, int>* list);
 	
 public:

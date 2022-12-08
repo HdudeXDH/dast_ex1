@@ -778,11 +778,16 @@ Node<K,V> * AVLTree<K,V>::sortedArrayToBST(Node<K,V>* arr[], int start, int end,
     /* Recursively construct the left subtree and make it
     left child of root */
     root->left = sortedArrayToBST(arr, start, mid-1,height+1);
+	if (root->left != nullptr) {
+		root->left->parent = root;
+	}
 
     /* Recursively construct the right subtree and make it
     right child of root */
     root->right = sortedArrayToBST(arr, mid+1, end,height+1);
-
+	if (root->right != nullptr) {
+		root->right->parent = root;
+	}
     return root;
 }
 

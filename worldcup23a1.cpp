@@ -349,8 +349,8 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         team2_array[i]->value->games_played+=team2->games_played-team2_array[i]->value->teams_matches_pre_arrival_count;
     }
     //merging the trees
-    newteam->players.merge_trees(team2->players,team2->players);
-    newteam->players_by_id.merge_trees(team2->players_by_id,team2->players_by_id);
+    newteam->players.merge_trees(team1->players,team2->players);
+    newteam->players_by_id.merge_trees(team1->players_by_id,team2->players_by_id);
     newteam->players_count = team1->players_count + team2->players_count;
     newteam->goal_keepers_count = team1->goal_keepers_count + team2->goal_keepers_count;
     newteam->power = team1->power + team2->power;

@@ -27,7 +27,9 @@ public:
 	// big 3
     Team() = delete;
 	Team(int id, int points);
-	~Team() = default;
+	~Team() {
+//        std::cout<<"team["<<id<<"] dtor"<<std::endl;
+    };
 
 	// other methods
     void add_player_to_team(Player* player);

@@ -25,8 +25,8 @@ bool PlayerLevel::operator==(const PlayerLevel & otherlevel) {
 //ctor at team cpp
 
 void Player::update_level() {
-	level->cards = cards;
-	level->goals = goals;
+	level.cards = cards;
+	level.goals = goals;
 }
 
 //std::ostream &operator<<(std::ostream &os, PlayerLevel const &m) {

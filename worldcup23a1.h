@@ -21,7 +21,7 @@
 #include "Player.h"
 #include "Team.h"
 #include "LinkedList.h"
-
+#include "memory"
 typedef int Team_id;
 typedef int Player_id;
 class world_cup_t {
@@ -35,10 +35,10 @@ private:
 	int players_count;
 
 	// methods
-	LinkedList<int, int>* export_lagitimate_teams_to_list(int minTeamId, int maxTeamId);
-    void renew_player_nextup_nextdown(Node<PlayerLevel, Player*> * player_node);
-	void recursive_export_to_list(int minTeamId, int maxTeamId, Node<int, Team*>* start, LinkedList<int, int>* list);
-	void Recursive_export_legitimate_teams_to_list(Node<int, Team*>* root, LinkedList<int, int>* list, int minId, int maxId);
+    std::shared_ptr<LinkedList<int, int>> export_lagitimate_teams_to_list(int minTeamId, int maxTeamId);
+    void renew_player_nextup_nextdown(std::shared_ptr<Node<PlayerLevel, Player*>> player_node);
+	void recursive_export_to_list(int minTeamId, int maxTeamId, std::shared_ptr<Node<int, Team*>> start, std::shared_ptr<LinkedList<int, int>> list);
+	void Recursive_export_legitimate_teams_to_list(std::shared_ptr<Node<int, Team*>> root, std::shared_ptr<LinkedList<int, int>> list, int minId, int maxId);
 	void printScoreboard();
 	
 public:

@@ -352,7 +352,6 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
 		if (team.players.is_empty()) {
 			return StatusType::FAILURE;
 		}
-        //todo: validate corrent complexity
         std::shared_ptr<Node<PlayerLevel, Player*>>* block_array =team.players.export_to_array();
 		for (int i=0; i< team.players.size;i++){
             output[i] =  block_array[i]->value->id;

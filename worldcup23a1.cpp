@@ -71,21 +71,21 @@ StatusType world_cup_t::remove_team(int teamId)
 }
 
 void world_cup_t::renew_player_nextup_nextdown(Node<PlayerLevel, Player*> * new_player_by_level){
+	Player *current_player = new_player_by_level->value;
     Node<PlayerLevel, Player*> *nextup = players_by_level.find_next_up(new_player_by_level);
-    Player* nextdown;
-    if (nextup== nullptr){
-        nextdown = top_scorrer;
-        top_scorrer=new_player_by_level->value;
-        new_player_by_level->value->next_down=nextdown;
-    } else {
-        nextdown = nextup->value->next_down;
-        new_player_by_level->value->next_down=nextdown;
-        nextup->value->next_down=new_player_by_level->value;
-        new_player_by_level->value->next_up=nextup->value;
+	Node<PlayerLevel, Player*> *nextdown_node = players_by_level.find_next_down(new_player_by_level);
+	Player* nextdown = nextdown_node->value;
+    if (nextup == nullptr){
+        top_scorrer = current_player;
+		current_player->next_up = nullptr;
     }
-    if (nextdown != nullptr){
-        nextdown->next_up=new_player_by_level->value;
-    }
+	if (nextdown == nullptr){
+		current_player->next_down
+	}
+	current_player->next_down = nextdown;
+	nextup->value->next_down=current_player;
+	current_player->next_up=nextup->value;
+
 //    std::cout <<"--------------"<<std::endl;
 //    printScoreboard();
 }
@@ -175,8 +175,8 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
         return StatusType::FAILURE;
     }
     Player * player = &(player_node_in_id_tree->value);
-    //update next_up & next down
-//    if (playerId==140){
+//    update next_up next down todo delete
+//    if (playerId==74){
 //        printScoreboard();
 //    }
     if (player->next_down != nullptr) {player->next_down->next_up = player->next_up;}
@@ -219,6 +219,9 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 //    if (playerId==140){
 //        printScoreboard();
 //    }
+//	if (playerId==74){
+//		printScoreboard();
+//	}
 	return StatusType::SUCCESS;
 }
 
@@ -454,6 +457,7 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 	if(players_by_id.size == 1) {
 		return StatusType::FAILURE;
 	}
+
 	return player_node->value->getCloset()->id;
 }
 

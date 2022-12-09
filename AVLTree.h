@@ -95,6 +95,7 @@ public:
     Node<K,V>** merge_arrays(Node<K,V> * arr1[], Node<K,V> * arr2[], int m, int n, Node<K,V> * mergedArr[]);
 	void Recursive_export_to_array(Node<K,V>* root, Node<K,V> **array, int *indexPtr);
     Node<K,V>* find_next_up(Node<K,V> * start);
+	Node<K,V>* find_next_down(Node<K,V> * start);
     int max(int a, int b){
         if (a>b){
             return a;
@@ -140,6 +141,21 @@ Node<K,V>* AVLTree<K, V>::find_next_up(Node<K,V> * start){
         parent=current->parent;
     }
     return parent;
+}
+
+template <typename K,typename V>
+Node<K,V>* AVLTree<K, V>::find_next_down(Node<K,V> * start){
+	if (start->left!= nullptr){
+		return AVLTree<K, V>::max_node(start->right);
+	}
+	Node<K,V>* current = start;
+	Node<K,V>* parent = start->parent;
+	while (parent!= nullptr && current==parent->left){
+
+		current=parent;
+		parent=current->parent;
+	}
+	return parent;
 }
 //template <typename K,typename V>
 //Node<K,V>* AVLTree<K, V>::find_next_down(Node<K,V> * start){

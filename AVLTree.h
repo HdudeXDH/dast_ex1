@@ -293,6 +293,7 @@ std::shared_ptr<Node<K, V>> AVLTree<K,V>::remove_by_key(const K& key, std::share
 	if (start_node == nullptr) {
 		start_node = root;
 	}
+//    start_node = root;
 	std::shared_ptr<Node<K, V>>target = search(key, false, start_node);
     if (target == nullptr){
         throw AVLTree<K,V>::NodeDoesntExists();
@@ -501,7 +502,13 @@ std::shared_ptr<Node<K, V>> AVLTree<K,V>::remove_link_from_chain(std::shared_ptr
 	} else {
 		this->root = son;
 	}
-    node_to_remove.reset();
+    if (son != nullptr){
+        son->parent=parent;
+    }
+    node_to_remove->parent= nullptr;
+    node_to_remove->left= nullptr;
+    node_to_remove->right= nullptr;
+    //    node_to_remove.reset();
 //	delete node_to_remove;
     return son;
 }

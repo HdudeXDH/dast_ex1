@@ -2,8 +2,6 @@
 #define DAST_EX1_TEAM_H
 #include "AVLTree.h"
 #include "Player.h"
-#include "Utils.h" //todo: delete this row
-//#include "Team.h"
 #define EMPTY_NUM 0
 #define ZERO 0
 #define MINIMUM_TEAM_SIZE_FOR_MATCH 11
@@ -20,16 +18,13 @@ public:
 	Player* top_scorrer;
 	int players_count;
 	int goal_keepers_count;
-	// power == sum (goals - cards)
 	int power;
 	int games_played;
 
 	// big 3
     Team() = delete;
 	Team(int id, int points);
-	~Team() {
-//        std::cout<<"team["<<id<<"] dtor"<<std::endl;
-    };
+	~Team() {};
 
 	// other methods
     void add_player_to_team(Player* player);
@@ -39,9 +34,6 @@ public:
 	int get_overall_score();
 	void bump_games_played();
     void validate_sizes();
-
-
-//    Team(int id, int points, Player* top_scorrer = nullptr, int power = ZERO, int games_played = ZERO, bool has_goal_keeper = false);
 
 };
 

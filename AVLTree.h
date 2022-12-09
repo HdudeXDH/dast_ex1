@@ -5,18 +5,6 @@
 #include <exception>
 #include <memory>
 #include <iostream>
-#include "tools.h"
-//#include "Utils.h" //todo: delete!
-//#define max(X, Y) (((X) > (Y)) ? (X) : (Y))
-
-//template <typename K, typename V>
-//class Node {
-//public:
-//	K key ;
-//	V value ;
-//	Node(const K& key, const V& value): key(key), value(value){};
-////	void merge_arrays(Node<K, V>** src1, int size1, Node<K, V>** src2, int size2, Node<K, V>** dst);
-//};
 
 template <typename K, typename V>
 class Node {
@@ -33,8 +21,6 @@ public:
 	bool has_two_sons();
 	bool is_leaf();
     int BF();
-//    bool operator==(const Node& node);
-//    bool operator>(const Node& node);
 };
 
 
@@ -50,52 +36,42 @@ private:
 	void LL_rotate(std::shared_ptr<Node<K, V>> dest);
 	void RL_rotate(std::shared_ptr<Node<K, V>> dest);
 	void LR_rotate(std::shared_ptr<Node<K, V>>dest);
-	void replace( std::shared_ptr<Node<K, V>> target, std::shared_ptr<Node<K, V>> replace_by, bool remove = true);
-//	void swap_keys_and_values(Node<K, V> *node1, Node<K, V> *node2);
 public:
-
-
-
     // members
     std::shared_ptr<Node<K, V>> root;
     int size;
-    // constructor and destractor
+
+	// constructor and destractor
 	AVLTree() : root(nullptr), size(0){};
     ~AVLTree(){
         if (root== nullptr) return;
-//        int n = size;
         int ix = 0;
         std::shared_ptr<Node<K, V>>* allNodes = new std::shared_ptr<Node<K, V>>[size];
         Recursive_export_to_array(root,allNodes, &ix);
-//        std::cout<<ix<<", "<<n<<std::endl;
         for (int i =0; i<ix;i++){
-//            delete allNodes[i];
             allNodes[i]->parent = nullptr;
             allNodes[i]->left = nullptr;
             allNodes[i]->right = nullptr;
         }
 		delete[] allNodes;
     };
+
 	//basic methods
 	std::shared_ptr<Node<K, V>> search(const K & target_key, bool return_parent= false, std::shared_ptr<Node<K, V>> start_node = nullptr);
-
     void swap_nodes(std::shared_ptr<Node<K, V>>node1, std::shared_ptr<Node<K, V>>node2);
     std::shared_ptr<Node<K, V>> add(const K& key, const V& value );
     std::shared_ptr<Node<K, V>> remove_by_key(const K& key, std::shared_ptr<Node<K, V>>start_node= nullptr);
 	std::shared_ptr<Node<K, V>> remove_Node(std::shared_ptr<Node<K, V>> to_remove, std::shared_ptr<Node<K, V>>start_node= nullptr);
-//    std::shared_ptr<Node<K, V>> remove_recursively(std::shared_ptr<Node<K, V>> to_remove);
     std::shared_ptr<Node<K, V>> max_node(std::shared_ptr<Node<K, V>> start = nullptr);
     std::shared_ptr<Node<K, V>>* export_to_array();
     bool is_empty() {return (root == nullptr);}
 	void merge_trees(AVLTree<K,V> & tree1, AVLTree<K,V> &tree2);
 	void create_avl_from_array(std::shared_ptr<Node<K, V>>* array, int n);
     void update_parent(std::shared_ptr<Node<K, V>>child,std::shared_ptr<Node<K, V>>target);
-    std::shared_ptr<Node<K, V>> sortedArrayToBST(std::shared_ptr<Node<K, V>> arr[], int start, int end, int height=1);
-	int height() { return get_height(root);};
+    std::shared_ptr<Node<K, V>> Recursive_sorted_array_to_tree(std::shared_ptr<Node<K, V>> arr[], int start, int end, int height=1);
 	class NodeAlreadyExists:public std::exception{};
 	class NodeDoesntExists:public std::exception{};
-    class AVLTreeNotEmpty:public std::exception{};
-    std::shared_ptr<Node<K, V>>* merge_arrays(std::shared_ptr<Node<K, V>> arr1[], std::shared_ptr<Node<K, V>> arr2[], int m, int n, std::shared_ptr<Node<K, V>> mergedArr[]);
+    std::shared_ptr<Node<K, V>>* merge_arrays(std::shared_ptr<Node<K, V>> array1[], std::shared_ptr<Node<K, V>> array2[], int array1_size, int array2_size, std::shared_ptr<Node<K, V>> merged_Array[]);
 	void Recursive_export_to_array(std::shared_ptr<Node<K, V>> root, std::shared_ptr<Node<K, V>>*array, int *indexPtr);
     std::shared_ptr<Node<K, V>> find_next_up(std::shared_ptr<Node<K, V>> start);
     int max(int a, int b){
@@ -104,10 +80,6 @@ public:
         }
         else return b;
     }
-//    Node<K,V>* find_next_down(Node<K,V> * start);
-
-
-//	bool friend operator>(const Node<K, V> & first, const Node<K, V> & second);
 };
 
 /**
@@ -118,18 +90,6 @@ public:
  ----------------- AVL implementations ----------------------------
  */
 
-//template <typename K,typename V>
-//Node<K,V>* remove_recursively(Node<K, V>* to_remove){
-//    if (to_remove== nullptr) return ;
-//    if (to_remove->is_leaf()) {
-//        update_parent(to_remove,nullptr);
-//        delete to_remove;
-//    }
-//    else{
-//        remove_recursively(to_remove->right);
-//        remove_recursively(to_remove->left);
-//    }
-//};
 template <typename K,typename V>
 std::shared_ptr<Node<K, V>> AVLTree<K, V>::find_next_up(std::shared_ptr<Node<K, V>> start){
     if (start->right!= nullptr){
@@ -144,18 +104,8 @@ std::shared_ptr<Node<K, V>> AVLTree<K, V>::find_next_up(std::shared_ptr<Node<K, 
     }
     return parent;
 }
-//template <typename K,typename V>
-//Node<K,V>* AVLTree<K, V>::find_next_down(Node<K,V> * start){
-//    if (!start->is_leaf()){
-//        return AVLTree<K, V>::max_node(start->left);
-//    }
-//    Node<K,V>* parent = start->parent;
-//    while (parent!= nullptr && start==parent->left){
-//        start=parent;
-//        parent=parent;
-//    }
-//    return parent;
-//};
+
+
 template <typename K,typename V>
 void AVLTree<K, V>::update_parent(std::shared_ptr<Node<K, V>>child,std::shared_ptr<Node<K, V>>target){
     if (child->parent== nullptr){
@@ -168,6 +118,7 @@ void AVLTree<K, V>::update_parent(std::shared_ptr<Node<K, V>>child,std::shared_p
         child->parent->left=target;
     }
 }
+
 
 template <typename K,typename V>
 std::shared_ptr<Node<K, V>> AVLTree<K, V>::search(const K & target_key, bool return_parent, std::shared_ptr<Node<K, V>>start_node) {
@@ -201,15 +152,13 @@ std::shared_ptr<Node<K, V>> AVLTree<K, V>::search(const K & target_key, bool ret
     }
 }
 
+
 template <typename K,typename V>
-// todo Alon - dont we want here v* value instead of const V& value ?
-std::shared_ptr<Node<K, V>>  AVLTree<K,V>::add(const K& key, const V& value ) {//(const K& key, const V& value ) {
+std::shared_ptr<Node<K, V>>  AVLTree<K,V>::add(const K& key, const V& value ) {
     std::shared_ptr<Node<K, V>>search_result = search(key, true);
 	int size = this->size;
-
-	// key doesn't exist - set the Node to the root of the tree
 	if (search_result == nullptr) {
-		std::shared_ptr<Node<K, V>>new_node = std::shared_ptr<Node<K, V>>(new Node<K, V>(key, value));//std::shared_ptr<Node<K, V>>(new Node<K, V>(key, value));
+		std::shared_ptr<Node<K, V>>new_node = std::shared_ptr<Node<K, V>>(new Node<K, V>(key, value));
 		this->root = new_node;
 		this->size = size + 1;
         return new_node;
@@ -220,7 +169,6 @@ std::shared_ptr<Node<K, V>>  AVLTree<K,V>::add(const K& key, const V& value ) {/
         }
         // insert as is regular Binary tree
         std::shared_ptr<Node<K, V>> new_node(new Node<K, V>(key, value));
-//        Node<K, V> *new_node = new Node<K, V>(key, value);//std::shared_ptr<Node<K, V>>(new Node<K, V>(key, value), value);
         new_node->parent = search_result;
         if (search_result->key > new_node->key) {
             search_result->left = new_node;
@@ -228,7 +176,6 @@ std::shared_ptr<Node<K, V>>  AVLTree<K,V>::add(const K& key, const V& value ) {/
             search_result->right = new_node;
         }
 		this->size = size + 1;
-        // AvlTree stuff
         std::shared_ptr<Node<K, V>> temp_node = new_node;
         while(temp_node != root) {
             std::shared_ptr<Node<K, V>> p = temp_node->parent;
@@ -251,6 +198,8 @@ std::shared_ptr<Node<K, V>>  AVLTree<K,V>::add(const K& key, const V& value ) {/
         return new_node;
     }
 }
+
+
 template <typename K,typename V>
 void AVLTree<K,V>::rotate(std::shared_ptr<Node<K, V>> dest){
     int balance = dest->BF();
@@ -262,9 +211,8 @@ void AVLTree<K,V>::rotate(std::shared_ptr<Node<K, V>> dest){
         return RR_rotate(dest);
     if (balance <-1 && dest->right->BF()==1)
         return RL_rotate(dest);
-
-
 }
+
 
 template <typename K,typename V>
 std::shared_ptr<Node<K, V>> AVLTree<K,V>::min( std::shared_ptr<Node<K, V>> start) {
@@ -273,6 +221,7 @@ std::shared_ptr<Node<K, V>> AVLTree<K,V>::min( std::shared_ptr<Node<K, V>> start
     }
     return start;
 }
+
 
 template <typename K,typename V>
 std::shared_ptr<Node<K, V>> AVLTree<K,V>::max_node( std::shared_ptr<Node<K, V>> start) {
@@ -287,6 +236,7 @@ std::shared_ptr<Node<K, V>> AVLTree<K,V>::max_node( std::shared_ptr<Node<K, V>> 
 	}
 	return start;
 }
+
 
 template <typename K,typename V>
 std::shared_ptr<Node<K, V>> AVLTree<K,V>::remove_by_key(const K& key, std::shared_ptr<Node<K, V>>start_node){
@@ -323,25 +273,21 @@ std::shared_ptr<Node<K, V>> AVLTree<K,V>::remove_by_key(const K& key, std::share
     return nullptr;
 }
 
+
 template <typename K,typename V>
 void AVLTree<K,V>::create_avl_from_array(std::shared_ptr<Node<K, V>>* array, int n){
-//    if (!this->is_empty()){throw AVLTree<K,V>::AVLTreeNotEmpty();}
-    root = sortedArrayToBST(array, 0, n-1);
+    root = Recursive_sorted_array_to_tree(array, 0, n - 1);
     if (root != nullptr){
         root->parent= nullptr;
     }
     size = n;
 }
 
-// todo big big fucking problem
+
 template <typename K,typename V>
 std::shared_ptr<Node<K, V>> AVLTree<K,V>::remove_Node(std::shared_ptr<Node<K, V>>to_remove, std::shared_ptr<Node<K, V>>start_node) {
-    //todo: node is root?
-    //todo: return?
 	std::shared_ptr<Node<K, V>> follower;
 	bool has_two_sons = to_remove->has_two_sons();
-//    size=size-1;
-	// if node is leaf
 	if (to_remove->is_leaf()) {
 		AVLTree::remove_leaf(to_remove);
 	}
@@ -349,23 +295,14 @@ std::shared_ptr<Node<K, V>> AVLTree<K,V>::remove_Node(std::shared_ptr<Node<K, V>
 		return AVLTree::remove_link_from_chain(to_remove);
 	} else {
 		follower = AVLTree<K,V>::min(to_remove->right);
-		swap_nodes(to_remove, follower); //todo: maybe better to use dummy, will be problem in player
+		swap_nodes(to_remove, follower);
 		return remove_Node(to_remove, to_remove->right);
 	}
 
 	return nullptr;
 }
 
-//template<typename K, typename  V>
-//void AVLTree<K,V>::swap_keys_and_values(std::shared_ptr<Node<K, V>>node1, std::shared_ptr<Node<K, V>>node2) {
-//	K temp_key = node1->key;
-//	node1->key = node2->key;
-//	node2->key = temp_key;
-//
-//	V temp_value = node1->value;
-//	node1->value = node2->value;
-//	node2->value = temp_value;
-//}
+
 template<typename K, typename  V>
 void AVLTree<K,V>::swap_nodes(std::shared_ptr<Node<K, V>>node1, std::shared_ptr<Node<K, V>>node2) {
 	//handle root
@@ -381,7 +318,6 @@ void AVLTree<K,V>::swap_nodes(std::shared_ptr<Node<K, V>>node1, std::shared_ptr<
         swap_nodes(node2, node1);
         return;
     }
-//return alon
     std::shared_ptr<Node<K, V>> temp_right_ptr, temp_left_ptr, temp_parent_ptr;
 	// set temp values for later
 	temp_left_ptr = node1->left;
@@ -452,9 +388,9 @@ void AVLTree<K,V>::swap_nodes(std::shared_ptr<Node<K, V>>node1, std::shared_ptr<
             }
         }
     }
-
-
 }
+
+
 template<typename K, typename  V>
 std::shared_ptr<Node<K, V>> AVLTree<K,V>::remove_leaf(std::shared_ptr<Node<K, V>>leaf_to_remove){
 	assert(leaf_to_remove->right == nullptr && leaf_to_remove->left == nullptr);
@@ -468,11 +404,10 @@ std::shared_ptr<Node<K, V>> AVLTree<K,V>::remove_leaf(std::shared_ptr<Node<K, V>
 		assert(parent->right == leaf_to_remove);
 		parent->right = nullptr;
 	}
-//	delete leaf_to_remove->value;
     leaf_to_remove.reset();
-//	delete leaf_to_remove;
     return parent;
 }
+
 
 template<typename K, typename  V>
 std::shared_ptr<Node<K, V>> AVLTree<K,V>::remove_link_from_chain(std::shared_ptr<Node<K, V>>node_to_remove){
@@ -506,11 +441,6 @@ std::shared_ptr<Node<K, V>> AVLTree<K,V>::remove_link_from_chain(std::shared_ptr
     return son;
 }
 
-template<typename K, typename  V>
-void AVLTree<K,V>::replace(std::shared_ptr<Node<K, V>>target, std::shared_ptr<Node<K, V>>replace_by, bool remove) {
-	target->value = replace_by;
-
-}
 
 template<typename K, typename  V>
 bool Node<K, V>::has_two_sons() {
@@ -523,60 +453,8 @@ bool Node<K, V>::is_leaf() {
 }
 
 
-//
-//template<typename K, typename  V>
-//void AVLTree<K,V>::replace(Node<K, V> *target, Node<K, V> *replace_by, bool remove_by_key) {
-//    Node<K, V> * by_parent= nullptr;
-//    Node<K, V> * by_right= nullptr;
-//    Node<K, V> * by_left= nullptr;
-//    if (replace_by!= nullptr){
-//        by_parent=replace_by->parent;
-//        by_left=replace_by->left;
-//        by_right=replace_by->right;
-//    }
-//    Node<K, V> * target_p= target->parent;
-//    Node<K, V> * target_right=target->right;
-//    Node<K, V> * target_left=target->left;
-//
-//    if (target_right!= nullptr) target_right->parent=replace_by;
-//    if (target_left!= nullptr) target_left->parent=replace_by;
-//    if (target_p!= nullptr) {
-//        if(target_p->left==target){
-//            target_p->left= replace_by;
-//        }
-//        else target_p->right= replace_by;
-//    }
-//    else{
-//        root=replace_by;
-//        replace_by->parent= nullptr;
-//    }
-//    replace_by->right=target_right;
-//    replace_by->left=target_left;
-//    if (by_parent!= nullptr&&remove_by_key){
-//        if (by_parent->left==replace_by){
-//            by_parent->left= nullptr;
-//        }
-//        else {by_parent->right= nullptr;}
-//    }
-//    if (replace_by!= nullptr&&(!remove_by_key)){
-//        replace_by->right= target_right;
-//        replace_by->left=target_left;
-//        if (by_parent!= nullptr) {
-//            if(by_parent->left==replace_by){
-//                by_parent->left= target;
-//            }
-//            else by_parent->right= target;
-//        }
-//        else{root=target;}
-//    }
-//
-//
-//
-//};
-
 template <typename K,typename V>
 void AVLTree<K,V>::LL_rotate(std::shared_ptr<Node<K, V>> b){
-//    std::cout<<"LL_rotate ("<<b->key<<")"<<std::endl;
     std::shared_ptr<Node<K, V>>a = b->left;
     std::shared_ptr<Node<K, V>>a_r = a->right;
     std::shared_ptr<Node<K, V>>b_p = b->parent;
@@ -598,13 +476,11 @@ void AVLTree<K,V>::LL_rotate(std::shared_ptr<Node<K, V>> b){
                     get_height(a->right)) + 1;
     b->height = max(get_height(b->left),
                     get_height(b->right)) + 1;
-
-//    // Return new root
-//    return x;
 }
+
+
 template <typename K,typename V>
 void AVLTree<K,V>::RR_rotate(std::shared_ptr<Node<K, V>> b){
-//    std::cout<<"RR_rotate ("<<b->key<<")"<<std::endl;
     std::shared_ptr<Node<K, V>>a = b->right;
     std::shared_ptr<Node<K, V>>a_l = a->left;
     std::shared_ptr<Node<K, V>>b_p = b->parent;
@@ -619,31 +495,11 @@ void AVLTree<K,V>::RR_rotate(std::shared_ptr<Node<K, V>> b){
     if (b==root){
         root=a;
     }
-//    printBT(root);
-    // Update heights
+
     b->height = max(get_height(b->left),
                     get_height(b->right)) + 1;
     a->height = max(get_height(a->left),
                     get_height(a->right)) + 1;
-//    printBT(root);
-//    Node<K,V> *y = dest->right;
-//    Node<K,V> *T2 = y->left;
-//
-//    // Perform rotation
-//    y->left = dest;
-//    dest->right = T2;
-//    if (dest==root){
-//        root=y;
-////        root->parent= nullptr;
-//    }
-//    y->parent=dest->parent;
-//    dest->parent=y;
-//
-//    // Update heights
-//    dest->height = max(get_height(dest->left),
-//                    get_height(dest->right)) + 1;
-//    y->height = max(get_height(y->left),
-//                    get_height(y->right)) + 1;
 
 }
 
@@ -663,7 +519,6 @@ template <typename K,typename V>
 std::shared_ptr<Node<K, V>>* AVLTree<K,V>::export_to_array() {
 	int size = this->size;
 	std::shared_ptr<Node<K, V>>* array = new std::shared_ptr<Node<K, V>>[size];
-	// in order organize to array
 	int index = 0;
 	Recursive_export_to_array(root, array, &index);
 	return array;
@@ -671,22 +526,17 @@ std::shared_ptr<Node<K, V>>* AVLTree<K,V>::export_to_array() {
 }
 template <typename K,typename V>
 void AVLTree<K,V>::Recursive_export_to_array(std::shared_ptr<Node<K, V>> root, std::shared_ptr<Node<K, V>>*array, int *indexPtr){
-	// recursion Base
 	if(root->is_leaf()) {
-		array[*indexPtr] = root;//new Node<K, V>(root->key, root->value);
+		array[*indexPtr] = root;
 		(*indexPtr)++;
 		return ;
 	}
-	// handle right subtree
 	if (root->left != nullptr) {
 		Recursive_export_to_array(root->left , array, indexPtr);
 	}
-
-	// add root
-	array[*indexPtr] = root;//new Node<K, V>(root->key, root->value);
+	array[*indexPtr] = root;
 	(*indexPtr)++;
 
-	// handle left subtree
 	if (root->right != nullptr) {
 		Recursive_export_to_array(root->right , array, indexPtr);
 	}
@@ -694,7 +544,6 @@ void AVLTree<K,V>::Recursive_export_to_array(std::shared_ptr<Node<K, V>> root, s
 
 template <typename K,typename V>
 void AVLTree<K,V>::merge_trees(AVLTree<K,V> & tree1, AVLTree<K,V> & tree2) {
-//    if (!is_empty()) {throw AVLTreeNotEmpty();}
 	int tree1_size = tree1.size, tree2_size = tree2.size;
 	std::shared_ptr<Node<K, V>>* tree1_array = tree1.export_to_array();
 	std::shared_ptr<Node<K, V>>* tree2_array = tree2.export_to_array();
@@ -715,36 +564,6 @@ void AVLTree<K,V>::merge_trees(AVLTree<K,V> & tree1, AVLTree<K,V> & tree2) {
 	delete[] tree2_array;
 }
 
-/**
- * aids
- */
-//template <typename K,typename V>
-//void Node<K,V>::merge_arrays(Node<K, V>** src1, int size1, Node<K, V>** src2,int size2, Node<K, V>** dst) {
-//	int index1 = 0, index2 = 0;
-//	int dst_arr_size = size1 + size2;
-//	while (index1 + index2 < dst_arr_size) {
-//		if (index1 >= size1) {
-//			dst[index1 + index2] = src2[index2];
-//			index2++;
-//		} else if (index2 >= size2) {
-//			dst[index1 + index2] = src1[index1];
-//			index1++;
-//		} else {
-//			Node<K, V>* block1 = src1[index1];
-//			K key1 = block1->key;
-//			Node<K, V>* block2 = src2[index2];
-//			K key2 = block2->key;
-//			if (key1 < key2) {
-//				dst[index1 + index2] = src1[index1];
-//				index1++;
-//			} else {
-//				dst[index1 + index2] = src1[index2];
-//				index2++;
-//			}
-//		}
-//	}
-//}
-
 
 /**
  ----------------------------- Node methods ----------------------------
@@ -756,52 +575,27 @@ int get_height(std::shared_ptr<Node<K, V>> target){
     if (target== nullptr) return 0;
     else return target->height;
 }
-//template <typename K,typename V>
-//int getBalance( Node<K,V>* target){
-//    if (target== nullptr) return 0;
-//    else return target->BF();
-//}
 
 template <typename K,typename V>
 int Node<K,V>::BF() {
     return (get_height(this->left) - get_height(this->right));
 }
-//
-//
-//template <typename K,typename V>
-//bool Node<K,V>::operator==(const Node<K,V>& node) {
-//    return node.key==this->key;
-//};
-//template <typename K,typename V>
-//bool Node<K,V>::operator>(const Node<K,V>& node) {
-//    return node.key>this->key;
-//};
 
-//-----
-//todo: cleanup
+
 template <typename K, typename V>
-std::shared_ptr<Node<K, V>> AVLTree<K,V>::sortedArrayToBST(std::shared_ptr<Node<K, V>> arr[], int start, int end, int height)
+std::shared_ptr<Node<K, V>> AVLTree<K,V>::Recursive_sorted_array_to_tree(std::shared_ptr<Node<K, V>> arr[], int start, int end, int height)
 {
-    /* Base Case */
     if (start > end)
         return nullptr;
 
-    /* Get the middle element and make it root */
     int mid = (start + end)/2;
-//    Node(const K& key, const V& value,,
-    std::shared_ptr<Node<K, V>>root = arr[mid]; //new Node<K,V>(arr[mid].key, arr[mid].value, height);
+    std::shared_ptr<Node<K, V>>root = arr[mid];
     root->height=height;
-
-    /* Recursively construct the left subtree and make it
-    left child of root */
-    root->left = sortedArrayToBST(arr, start, mid-1,height+1);
+    root->left = Recursive_sorted_array_to_tree(arr, start, mid - 1, height + 1);
 	if (root->left != nullptr) {
 		root->left->parent = root;
 	}
-
-    /* Recursively construct the right subtree and make it
-    right child of root */
-    root->right = sortedArrayToBST(arr, mid+1, end,height+1);
+    root->right = Recursive_sorted_array_to_tree(arr, mid + 1, end, height + 1);
 	if (root->right != nullptr) {
 		root->right->parent = root;
 	}
@@ -809,47 +603,39 @@ std::shared_ptr<Node<K, V>> AVLTree<K,V>::sortedArrayToBST(std::shared_ptr<Node<
 }
 
 
-//todo: clean up
 template <typename K, typename V>
-std::shared_ptr<Node<K, V>>* AVLTree<K,V>::merge_arrays(std::shared_ptr<Node<K,V>>  arr1[], std::shared_ptr<Node<K,V>> arr2[], int m, int n, std::shared_ptr<Node<K, V>> mergedArr[])
+std::shared_ptr<Node<K, V>>* AVLTree<K,V>::merge_arrays(std::shared_ptr<Node<K,V>>  array1[], std::shared_ptr<Node<K,V>> array2[], int array1_size, int array2_size, std::shared_ptr<Node<K, V>> merged_Array[])
 {
-    // mergedArr[] is going to contain result
-
-//    Node<K,V>* mergedArr[m + n];
-    int i = 0, j = 0, k = 0;
-
-    // Traverse through both arrays
-    while (i < m && j < n)
+    int array_1_index = 0, array_2_index = 0, new_array_index = 0;
+    while (array_1_index < array1_size && array_2_index < array2_size)
     {
-        // Pick the smaller element and put it in mergedArr
-        if (arr1[i]->key < arr2[j]->key)
+        if (array1[array_1_index]->key < array2[array_2_index]->key)
         {
-            mergedArr[k] = arr1[i];
-            i++;
+			merged_Array[new_array_index] = array1[array_1_index];
+            array_1_index+=1;
         }
         else
         {
-            mergedArr[k] = arr2[j];
-            j++;
+			merged_Array[new_array_index] = array2[array_2_index];
+            array_2_index+=1;
         }
-        k++;
+        new_array_index+=1;
     }
 
-    // If there are more elements in first array
-    while (i < m)
+    while (array_1_index < array1_size)
     {
-        mergedArr[k] = arr1[i];
-        i++; k++;
+		merged_Array[new_array_index] = array1[array_1_index];
+		new_array_index+=1;
+		array_1_index+=1;
     }
 
-    // If there are more elements in second array
-    while (j < n)
+    while (array_2_index < array2_size)
     {
-        mergedArr[k] = arr2[j];
-        j++; k++;
-    }
-
-    return mergedArr;
+		merged_Array[new_array_index] = array2[array_2_index];
+		new_array_index+=1;
+		array_2_index+=1;
+	}
+    return merged_Array;
 }
 
 

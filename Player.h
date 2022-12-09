@@ -1,6 +1,5 @@
 #ifndef DAST_EX1_PLAYER_H
 #define DAST_EX1_PLAYER_H
-//#include "Team.h"
 #include <iostream>
 
 class Team;
@@ -22,9 +21,7 @@ public:
 
 class Player {
 public:
-	// used to be private:
 	int id;
-//	Team* team;
     Team* team;
 	int games_played;
 	int goals;
@@ -38,10 +35,7 @@ public:
 
 	Player()= delete;
 	Player(int playerId, Team* team, int gamesPlayed, int goals, int cards, bool goalKeeper);
-    ~Player() {
-//        delete level;
-//        std::cout<<"Player["<<id<<"] dtor"<<std::endl;
-    };
+    ~Player() {};
 	void update_level();
     bool operator> (const Player& other) const;
 	int get_total_games_played();
@@ -69,11 +63,6 @@ public:
         if (next_down->id>next_up->id) return next_down;
         else return next_up;
     }
-
-
-    /**
-     * getters and setters - add needed
-     */
 };
 
 

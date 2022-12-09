@@ -17,7 +17,7 @@
 #define POINTS_TO_ADD 3
 
 #include "wet1util.h"
-//#include "AVLTree.h"
+#include "AVLTree.h"
 #include "Player.h"
 #include "Team.h"
 #include "LinkedList.h"
@@ -37,9 +37,7 @@ private:
 	// methods
     std::shared_ptr<LinkedList<int, int>> export_lagitimate_teams_to_list(int minTeamId, int maxTeamId);
     void renew_player_nextup_nextdown(std::shared_ptr<Node<PlayerLevel, Player*>> player_node);
-	void recursive_export_to_list(int minTeamId, int maxTeamId, std::shared_ptr<Node<int, Team*>> start, std::shared_ptr<LinkedList<int, int>> list);
 	void Recursive_export_legitimate_teams_to_list(std::shared_ptr<Node<int, Team*>> root, std::shared_ptr<LinkedList<int, int>> list, int minId, int maxId);
-	void printScoreboard();
 	
 public:
 	// <DO-NOT-MODIFY> {

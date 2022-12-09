@@ -1,7 +1,5 @@
 #include "Team.h"
 
-//Team::Team(int id, int points, Player* top_scorrer = nullptr, int power = ZERO, int games_played = ZERO, bool has_goal_keeper = false):
-//	 id(id), points(points), top_scorrer(top_scorrer), power(power), games_played(games_played), has_goal_keeper(has_goal_keeper) {};
 
 Team::Team(int id, int points): id(id), points(points), top_scorrer(nullptr), players_count(EMPTY_NUM),
 								goal_keepers_count(EMPTY_NUM), power(EMPTY_NUM), games_played(EMPTY_NUM) {
@@ -11,9 +9,6 @@ Team::Team(int id, int points): id(id), points(points), top_scorrer(nullptr), pl
 }
 
 void Team::add_player_to_team(Player* player) {
-//    if (id == 20){
-//        printBT(players.root);
-//    }
 	assert(player != nullptr);
 	players.add(player->level, player);
     players_by_id.add(player->id, player);
@@ -27,7 +22,6 @@ void Team::add_player_to_team(Player* player) {
 		top_scorrer = player;
 	}
     if ( top_scorrer->level < player->level){
-//        bool doublecheck = *top_scorrer->level < *player->level;
         top_scorrer = player;
     }
 }
@@ -81,11 +75,5 @@ Player::Player(int playerId, Team* team, int gamesPlayed, int goals, int cards, 
         id(playerId), team(team), games_played(gamesPlayed), goals(goals), cards(cards), is_goal_keeper(goalKeeper),
         level(PlayerLevel(goals, cards, playerId)), next_up(nullptr), next_down(
         nullptr) {
-//    level = PlayerLevel(goals, cards, playerId);
     teams_matches_pre_arrival_count=team->games_played;
 }
-//void Team::update_team_stats(int playerId, int gamesPlayed, int scoredGoals, int cardsReceived) {
-//
-//	Node<PlayerLevel, Player> *new_top_scorrer = players.max_node();
-//	top_scorrer = new_top_scorrer->value;
-//}

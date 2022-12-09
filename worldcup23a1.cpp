@@ -24,7 +24,7 @@ StatusType world_cup_t::add_team(int teamId, int points)
 	if (teamId <= 0 || points < 0) {
 		return StatusType::INVALID_INPUT;
 	}
-	Node<Team_id, Team> *search_result = teams.search(teamId, true);
+	std::shared_ptr<Node<Team_id, Team>> search_result = teams.search(teamId, true);
 	if(search_result != nullptr) {
 		if (search_result->value.id ==teamId) return StatusType::FAILURE;
 	}
@@ -46,7 +46,7 @@ StatusType world_cup_t::remove_team(int teamId)
 	if (teamId <= 0) {
 		return StatusType::INVALID_INPUT;
 	}
-	Node<int, Team>* search_result = teams.search(teamId); //Node<Team_id, Team>* //AVLTree<Team_id, Team>::search(teamId);
+	std::shared_ptr<Node<int, Team>> search_result = teams.search(teamId); //std::shared_ptr<Node<Team_id, Team>* //AVLTree<Team_id, Team>::search(teamId);
 	// todo check what is returned if key doesnt exist
 	if (search_result == nullptr) {
 		// team doens't exists
@@ -70,8 +70,8 @@ StatusType world_cup_t::remove_team(int teamId)
     return StatusType::SUCCESS;
 }
 
-void world_cup_t::renew_player_nextup_nextdown(Node<PlayerLevel, Player*> * new_player_by_level){
-    Node<PlayerLevel, Player*> *nextup = players_by_level.find_next_up(new_player_by_level);
+void world_cup_t::renew_player_nextup_nextdown(std::shared_ptr<Node<PlayerLevel, Player*> > new_player_by_level){
+    std::shared_ptr<Node<PlayerLevel, Player*>>nextup = players_by_level.find_next_up(new_player_by_level);
     Player* nextdown;
     if (nextup== nullptr){
         nextdown = top_scorrer;
@@ -99,17 +99,17 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 	if (gamesPlayed == 0 && (goals > 0 || cards > 0)) {
 		return StatusType::INVALID_INPUT;
 	}
-	Node<Team_id, Team> *team_search_result = teams.search(teamId);
-    Node<int, Player> *player_search_result = players_by_id.search(playerId); //Node<Player_id, Player>
+	std::shared_ptr<Node<Team_id, Team>> team_search_result = teams.search(teamId);
+    std::shared_ptr<Node<int, Player> >player_search_result = players_by_id.search(playerId); //std::shared_ptr<Node<Player_id, Player>
 	if(team_search_result == nullptr || player_search_result != nullptr ) {
 		return StatusType::FAILURE;
 	}
 	Team *team_to_add_player = &team_search_result->value;
 	try {
-		Player* player = new Player(playerId,&team_search_result->value, gamesPlayed, goals, cards, goalKeeper);
-        Node<int, Player> *new_player = players_by_id.add(playerId, *player);
-		delete player;
-        Node<PlayerLevel, Player*> *new_player_by_level = players_by_level.add(new_player->value.level, &new_player->value);
+
+        std::shared_ptr<Node<int, Player>> new_player = players_by_id.add(playerId, Player(playerId,&team_search_result->value, gamesPlayed, goals, cards, goalKeeper));
+//		delete player;
+        std::shared_ptr<Node<PlayerLevel, Player*> >new_player_by_level = players_by_level.add(new_player->value.level, &new_player->value);
         renew_player_nextup_nextdown(new_player_by_level);
 		bool was_team_legitimate_before_adding = team_to_add_player->is_legitimate_for_match();
 		team_to_add_player->add_player_to_team(&new_player->value);
@@ -131,14 +131,14 @@ StatusType world_cup_t::remove_player(int playerId)
 	if (playerId <= 0) {
 		return StatusType::INVALID_INPUT;
 	}
-	Node<Player_id, Player> *player_node_in_id_tree = players_by_id.search(playerId);
+	std::shared_ptr<Node<Player_id, Player>>player_node_in_id_tree = players_by_id.search(playerId);
 	if (player_node_in_id_tree == nullptr) {
 		return StatusType::FAILURE;
 	}
 	Player *player_to_remove = &player_node_in_id_tree->value;
 	Team *players_team = player_to_remove->team;
 	PlayerLevel  level = player_to_remove->level;
-	Node<PlayerLevel, Player*> *player_node_in_level_tree = players_by_level.search(level);
+	std::shared_ptr<Node<PlayerLevel, Player*>>player_node_in_level_tree = players_by_level.search(level);
 	try {
 		// remove player from all AVL trees
 		bool was_team_legitimate_before_removing = players_team->is_legitimate_for_match();
@@ -153,7 +153,7 @@ StatusType world_cup_t::remove_player(int playerId)
 		}
 		//delete player
 //		delete player_to_remove;
-        Node<PlayerLevel,Player*> *new_top_scorrer = players_by_level.max_node();
+        std::shared_ptr<Node<PlayerLevel,Player*>>new_top_scorrer = players_by_level.max_node();
         if (new_top_scorrer == nullptr){
             top_scorrer= nullptr;
         }
@@ -170,7 +170,7 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 	if (playerId <= 0 || gamesPlayed < 0 || scoredGoals < 0 || cardsReceived <0) {
 		return StatusType::INVALID_INPUT;
 	}
-	Node<Player_id, Player> *player_node_in_id_tree = players_by_id.search(playerId);
+	std::shared_ptr<Node<Player_id, Player>>player_node_in_id_tree = players_by_id.search(playerId);
     if (player_node_in_id_tree == nullptr) {
         return StatusType::FAILURE;
     }
@@ -204,7 +204,7 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 	player->cards = (player->cards + cardsReceived);
 	player->update_level();
 	try {
-        Node<PlayerLevel, Player*> *new_player_by_level =players_by_level.add(player->level, player);
+        std::shared_ptr<Node<PlayerLevel, Player*>>new_player_by_level =players_by_level.add(player->level, player);
 //        if (playerId==140){
 //            printScoreboard();
 //        }
@@ -227,8 +227,8 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
 	if (teamId1 == teamId2 || teamId1 <= 0 || teamId2 <= 0) {
 		return StatusType::INVALID_INPUT;
 	}
-    Node<int,Team> * team1_node =  teams.search(teamId1);
-    Node<int,Team> * team2_node =  teams.search(teamId2);
+    std::shared_ptr<Node<int,Team>> team1_node =  teams.search(teamId1);
+    std::shared_ptr<Node<int,Team>> team2_node =  teams.search(teamId2);
 
 	if (team1_node == nullptr || team2_node == nullptr ) {
 		return StatusType::FAILURE;
@@ -260,7 +260,7 @@ output_t<int> world_cup_t::get_num_played_games(int playerId)
 	if (playerId <= 0) {
 		return output_t<int>(StatusType::INVALID_INPUT);
 	}
-	Node <int, Player> * player_node = players_by_id.search(playerId);
+    std::shared_ptr<Node <int, Player>> player_node = players_by_id.search(playerId);
 	if (player_node == nullptr) {
 		return output_t<int>(StatusType::FAILURE);
 	}
@@ -274,7 +274,7 @@ output_t<int> world_cup_t::get_team_points(int teamId)
 	if (teamId <= 0) {
 		return output_t<int>(StatusType::INVALID_INPUT);
 	}
-    Node <int, Team> * team_node = teams.search(teamId);
+    std::shared_ptr<Node <int, Team>> team_node = teams.search(teamId);
 
 	if (team_node == nullptr) {
 		return output_t<int>(StatusType::FAILURE);
@@ -286,12 +286,12 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 {
 	// team search and validation
     if (teamId1==teamId2 || newTeamId <= 0 || teamId2 <= 0 || teamId1 <= 0) return StatusType::INVALID_INPUT;
-    Node <int, Team> * team1_node = teams.search(teamId1);
-    Node <int, Team> * team2_node = teams.search(teamId2);
+    std::shared_ptr<Node <int, Team>> team1_node = teams.search(teamId1);
+    std::shared_ptr<Node <int, Team>> team2_node = teams.search(teamId2);
     if (team1_node == nullptr || team2_node == nullptr) {
 		return StatusType::FAILURE;
 	}
-	Node <int, Team> * newteam_node = teams.search(newTeamId);
+	std::shared_ptr<Node <int, Team>> newteam_node = teams.search(newTeamId);
 	if ((newteam_node != nullptr) && (newteam_node != team1_node) && (newteam_node != team2_node)) {
 		return StatusType::FAILURE;
 	}
@@ -310,12 +310,12 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     if (team2->is_legitimate_for_match()) legitimate_teams.remove_by_key(teamId2);
 
     //todo: update all players
-    Node<PlayerLevel, Player*>** team1_array = team1->players.export_to_array();
+    std::shared_ptr<Node<PlayerLevel, Player*>>* team1_array = team1->players.export_to_array();
     for (int i=0;i<team1->players_count;i++){
 		team1_array[i]->value->games_played+=team1->games_played-team1_array[i]->value->teams_matches_pre_arrival_count;
 		team1_array[i]->value->team = newteam;
     }
-    Node<PlayerLevel, Player*>** team2_array = team2->players.export_to_array();
+    std::shared_ptr<Node<PlayerLevel, Player*>>* team2_array = team2->players.export_to_array();
     for (int i=0;i<team2->players_count;i++){
 		team2_array[i]->value->games_played+=team2->games_played-team2_array[i]->value->teams_matches_pre_arrival_count;
 		team2_array[i]->value->team = newteam;
@@ -356,7 +356,7 @@ output_t<int> world_cup_t::get_top_scorer(int teamId)
 		return output_t<int>(StatusType::INVALID_INPUT);
 	}
 	if (teamId > 0 ) {
-        Node <int, Team> * team_node = teams.search(teamId);
+        std::shared_ptr<Node <int, Team>> team_node = teams.search(teamId);
 //		Team* team = teams.search(teamId);
 		if (team_node == nullptr) {
 			return output_t<int>(StatusType::FAILURE);
@@ -375,7 +375,7 @@ output_t<int> world_cup_t::get_all_players_count(int teamId)
 		return output_t<int>(StatusType::INVALID_INPUT);
 	}
 	if (teamId > 0 ) {
-        Node <int, Team> * team_node = teams.search(teamId);
+        std::shared_ptr<Node <int, Team>> team_node = teams.search(teamId);
 //		Team* team = teams.search(teamId);
 		if (team_node == nullptr) {
 			return output_t<int>(StatusType::FAILURE);
@@ -399,7 +399,7 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
 		return StatusType::FAILURE;
 	}
 	if (teamId > 0 ) {
-        Node <int, Team> * team_node = teams.search(teamId);
+        std::shared_ptr<Node <int, Team>> team_node = teams.search(teamId);
 
         if (team_node == nullptr) {
             return StatusType::FAILURE;
@@ -409,7 +409,7 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
 			return StatusType::FAILURE;
 		}
         //todo: validate corrent complexity
-        Node<PlayerLevel, Player*>** block_array =team.players.export_to_array();
+        std::shared_ptr<Node<PlayerLevel, Player*>>* block_array =team.players.export_to_array();
 		for (int i=0; i< team.players.size;i++){
             output[i] =  block_array[i]->value->id;
 		}
@@ -418,14 +418,14 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
 	} else if (teamId < 0 && players_by_level.size == 0) {
 		return StatusType::FAILURE;
 	}
-	Node<PlayerLevel, Player*>** block_array =players_by_level.export_to_array();
+	std::shared_ptr<Node<PlayerLevel, Player*>>* block_array =players_by_level.export_to_array();
 	for (int i=0; i< players_by_level.size;i++){
 		output[i] =  block_array[i]->value->id;
 	}
 	return StatusType::SUCCESS;
 }
 void world_cup_t::printScoreboard() {
-    Node <PlayerLevel, Player*> ** testArr =players_by_level.export_to_array();
+    std::shared_ptr<Node <PlayerLevel, Player*>>* testArr =players_by_level.export_to_array();
     for (int i=0; i<players_by_level.size;i++){
         std::cout<<testArr[i]->value->id<<"("<<testArr[i]->value->goals<<","<<testArr[i]->value->cards<<")";
         if (testArr[i]->value->next_up == nullptr){
@@ -446,11 +446,11 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 	if (playerId <= 0 || teamId <= 0) {
 		return StatusType::INVALID_INPUT;
 	}
-    Node <int, Team> * team_node = teams.search(teamId);
+    std::shared_ptr<Node <int, Team>> team_node = teams.search(teamId);
     if (team_node== nullptr){
         return StatusType::FAILURE;
     }
-    Node <int, Player*> * player_node = team_node->value.players_by_id.search(playerId);
+    std::shared_ptr<Node <int, Player*>> player_node = team_node->value.players_by_id.search(playerId);
     if (player_node== nullptr){
         return StatusType::FAILURE;
     }
@@ -470,17 +470,17 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 	}
 //	playing_teams;
 //    int ix=0; // bad example minTeamId = 3, max = 19
-//    Node<int, Team> * deleteme[teams.size];
+//    std::shared_ptr<Node<int, Team> * deleteme[teams.size];
 //    teams.Recursive_export_to_array(teams.root, deleteme,&ix);
 //    int ix2=0;
-//    Node<int, Team*> * deleteme2[legitimate_teams.size];
+//    std::shared_ptr<Node<int, Team*> * deleteme2[legitimate_teams.size];
 //    legitimate_teams.Recursive_export_to_array(legitimate_teams.root, deleteme2,&ix2);
-    LinkedList<int, int> * playing_teams = export_lagitimate_teams_to_list(minTeamId, maxTeamId);
+    std::shared_ptr<LinkedList<int, int>> playing_teams = export_lagitimate_teams_to_list(minTeamId, maxTeamId);
 	if (playing_teams->size <= 0) {
 		return output_t<int>(StatusType::FAILURE);
 	}
-	LinkedList_Node<int, int> * first_team = playing_teams->head->next, *second_team;
-    LinkedList_Node<int, int> *next_pair;
+    std::shared_ptr<LinkedList_Node<int, int>> first_team = playing_teams->head->next, second_team;
+    std::shared_ptr<LinkedList_Node<int, int>> next_pair;
 	int new_value;
 	while(playing_teams->size > 1) {
 		while (first_team!=nullptr && first_team->next != nullptr){
@@ -518,7 +518,8 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 //    delete playing_teams->head;
 //
 //    delete playing_teams->tail;
-    delete playing_teams;
+
+//    delete playing_teams; todo
 	return output_t<int>(winner);
     // if num players < num teams, get player list, and
     //todo: create "valid" teams
@@ -528,8 +529,8 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 
 ///// -------------------- private methods ---------------------
 
-LinkedList<int, int>* world_cup_t::export_lagitimate_teams_to_list(int minTeamId, int maxTeamId) {
-	LinkedList<int, int>* playing_teams = new LinkedList<int, int>();
+std::shared_ptr<LinkedList<int, int>> world_cup_t::export_lagitimate_teams_to_list(int minTeamId, int maxTeamId) {
+    std::shared_ptr<LinkedList<int, int>> playing_teams = std::shared_ptr<LinkedList<int, int>>(new LinkedList<int, int>());
 //    int ix2=0;
 //    Node<int, Team*> * raw_array[legitimate_teams.size];
 	Recursive_export_legitimate_teams_to_list(legitimate_teams.root, playing_teams,minTeamId, maxTeamId);
@@ -544,7 +545,7 @@ LinkedList<int, int>* world_cup_t::export_lagitimate_teams_to_list(int minTeamId
 }
 
 
-void world_cup_t::Recursive_export_legitimate_teams_to_list(Node<int, Team*>* root, LinkedList<int, int>* list, int minId, int maxId) {
+void world_cup_t::Recursive_export_legitimate_teams_to_list(std::shared_ptr<Node<int, Team*>> root, std::shared_ptr<LinkedList<int, int>> list, int minId, int maxId) {
 	if (root->key > minId) {
 		if (root->left != nullptr) {
 			Recursive_export_legitimate_teams_to_list(root->left, list, minId, maxId);

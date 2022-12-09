@@ -43,7 +43,7 @@ void Team::remove_player_from_team(Player* player) {
 	int deduct_from_power = (player->goals - player->cards);
 	this->power = this->power - deduct_from_power;
 	if(player == top_scorrer) {
-		Node<PlayerLevel, Player*> *new_top_scorrer = players.max_node();
+		std::shared_ptr<Node<PlayerLevel,Player*>> new_top_scorrer = players.max_node();
         if (new_top_scorrer== nullptr){
             top_scorrer=nullptr;
             return;

@@ -11,8 +11,8 @@ public:
 	// members
 	K key;
 	V value;
-	LinkedList_Node<K,V>* next;
-	LinkedList_Node<K,V>* prev;
+    std::shared_ptr<LinkedList_Node<K,V>> next;
+    std::shared_ptr<LinkedList_Node<K,V>> prev;
 
 
 	// Ctor & Dtor
@@ -30,8 +30,8 @@ public:
 	// members
 	// Head is dummy, does not have a value
 	int size;
-	LinkedList_Node<K,V>* head;
-	LinkedList_Node<K,V>* tail;
+    std::shared_ptr<LinkedList_Node<K,V>> head;
+    std::shared_ptr<LinkedList_Node<K,V>> tail;
 
 	// Ctor & Dtor
 	LinkedList(): size(0), head(new LinkedList_Node<K,V>()), tail(head) {
@@ -39,33 +39,39 @@ public:
 		tail->next = nullptr;
 	};
 	~LinkedList() {
-		LinkedList_Node<K,V>* next = head->next;
-		LinkedList_Node<K,V>* nextnext = head->next->next;
-		while (nextnext != tail &&nextnext != nullptr) {
-			delete next;
-			next = nextnext;
-			nextnext = next->next;
-		}
-		delete head;
-		delete tail;
+        std::shared_ptr<LinkedList_Node<K,V>> current = head;
+        while (current->next!= nullptr){
+            current->next=nullptr;
+            current->prev=nullptr;
+        }
+//        std::shared_ptr<LinkedList_Node<K,V>> next = head->next;
+//        std::shared_ptr<LinkedList_Node<K,V>> nextnext = head->next->next;
+
+//		while (nextnext != tail &&nextnext != nullptr) {
+//			delete next;
+//			next = nextnext;
+//			nextnext = next->next;
+//		}
+//		delete head;
+//		delete tail;
 	}
 
 	// methods
 	void add(K key, V value);
-	bool remove_node(LinkedList_Node<K,V>* to_remove);
+	bool remove_node(std::shared_ptr<LinkedList_Node<K,V>>to_remove);
 };
 
 
 template <typename K, typename V>
 void LinkedList<K,V>::add(K key, V value) {
-	LinkedList_Node<K,V>* new_node = new LinkedList_Node<K,V>(key, value);
+    std::shared_ptr<LinkedList_Node<K,V>> new_node = std::shared_ptr<LinkedList_Node<K,V>>(new LinkedList_Node<K,V>(key, value));
 	new_node->prev = tail;
 	tail->next = new_node;
 	tail = new_node;
 	size++;
 }
 template <typename K, typename V>
-bool LinkedList<K,V>::remove_node(LinkedList_Node<K,V>* to_remove) {
+bool LinkedList<K,V>::remove_node(std::shared_ptr<LinkedList_Node<K,V>> to_remove) {
 	if (size == 1 || to_remove == head) {
 		return false;
 	}
@@ -76,13 +82,13 @@ bool LinkedList<K,V>::remove_node(LinkedList_Node<K,V>* to_remove) {
 		tail = tail->prev;
 		tail->next = nullptr;
 	} else {
-		LinkedList_Node<K,V>* before = to_remove->prev;
-		LinkedList_Node<K,V>* after = to_remove->next;
+        std::shared_ptr<LinkedList_Node<K,V>> before = to_remove->prev;
+        std::shared_ptr<LinkedList_Node<K,V>> after = to_remove->next;
 		before->next = after;
 		after->prev = before;
 	}
 	size--;
-	delete to_remove;
+//	delete to_remove;
 	return true;
 }
 

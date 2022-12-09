@@ -135,17 +135,21 @@ StatusType world_cup_t::remove_player(int playerId)
 	if (player_node_in_id_tree == nullptr) {
 		return StatusType::FAILURE;
 	}
-	Player *player_to_remove = &player_node_in_id_tree->value;
-	Team *players_team = player_to_remove->team;
-	PlayerLevel  level = player_to_remove->level;
+//	Player *player_to_remove = &player_node_in_id_tree->value;
+	Team *players_team = player_node_in_id_tree->value.team;
+	PlayerLevel level = player_node_in_id_tree->value.level;
 	std::shared_ptr<Node<PlayerLevel, Player*>>player_node_in_level_tree = players_by_level.search(level);
 	try {
 		// remove player from all AVL trees
 		bool was_team_legitimate_before_removing = players_team->is_legitimate_for_match();
-		if (player_to_remove->next_down != nullptr) {player_to_remove->next_down->next_up = player_to_remove->next_up;}
-		if (player_to_remove->next_up != nullptr) {player_to_remove->next_up->next_down = player_to_remove->next_down;}
-		players_by_level.remove_by_key(player_node_in_level_tree->key);
-        players_team->remove_player_from_team(player_to_remove);
+		if (player_node_in_id_tree->value.next_down != nullptr) {
+            player_node_in_id_tree->value.next_down->next_up = player_node_in_id_tree->value.next_up;
+        }
+		if (player_node_in_id_tree->value.next_up != nullptr) {
+            player_node_in_id_tree->value.next_up->next_down = player_node_in_id_tree->value.next_down;
+        }
+        players_by_level.remove_by_key(player_node_in_level_tree->key);
+        players_team->remove_player_from_team(&player_node_in_id_tree->value);
         players_by_id.remove_by_key(player_node_in_id_tree->key);
         players_count = players_count - 1;
 		if (was_team_legitimate_before_removing && !players_team->is_legitimate_for_match()) {

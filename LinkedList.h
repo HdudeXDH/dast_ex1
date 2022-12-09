@@ -41,7 +41,7 @@ public:
 	~LinkedList() {
 		LinkedList_Node<K,V>* next = head->next;
 		LinkedList_Node<K,V>* nextnext = head->next->next;
-		while (nextnext != tail) {
+		while (nextnext != tail &&nextnext != nullptr) {
 			delete next;
 			next = nextnext;
 			nextnext = next->next;

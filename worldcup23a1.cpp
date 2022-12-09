@@ -515,9 +515,9 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 //    delete  playing_teams->head->next;
 //    delete playing_teams->tail->next;
 //    delete playing_teams->head->next;
-    delete playing_teams->head;
-
-    delete playing_teams->tail;
+//    delete playing_teams->head;
+//
+//    delete playing_teams->tail;
     delete playing_teams;
 	return output_t<int>(winner);
     // if num players < num teams, get player list, and

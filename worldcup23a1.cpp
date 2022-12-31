@@ -176,7 +176,7 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 	player->update_level();
 	try {
         std::shared_ptr<Node<PlayerLevel, Player*>>new_player_by_level =players_by_level.add(player->level, player);
-        if (top_scorrer==player) top_scorrer=player->next_down;
+        top_scorrer = (top_scorrer==player)? player->next_down : top_scorrer;
         renew_player_nextup_nextdown(new_player_by_level);
 		team->add_player_to_team(player);
 	} catch (std::exception& err) {

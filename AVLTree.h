@@ -256,7 +256,7 @@ std::shared_ptr<Node<K, V>> AVLTree<K,V>::remove_by_key(const K& key, std::share
     while(temp != root) {
         std::shared_ptr<Node<K, V>> p = temp->parent;
         // if the tree is AVL balanced
-        if (get_height(p) >= get_height(temp)){
+        if ( get_height(p)== (1+max(get_height(p->left),get_height(p->right)))){//if (get_height(p) >= get_height(temp)){
             return temp;
         } else {
             // check if rotation needed
@@ -526,7 +526,8 @@ std::shared_ptr<Node<K, V>>* AVLTree<K,V>::export_to_array() {
 }
 template <typename K,typename V>
 void AVLTree<K,V>::Recursive_export_to_array(std::shared_ptr<Node<K, V>> root, std::shared_ptr<Node<K, V>>*array, int *indexPtr){
-	if(root->is_leaf()) {
+	if(root==nullptr) return;
+    if(root->is_leaf()) {
 		array[*indexPtr] = root;
 		(*indexPtr)++;
 		return ;

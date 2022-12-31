@@ -29,3 +29,10 @@ void Player::update_level() {
 	level.cards = cards;
 	level.goals = goals;
 }
+
+// Implement the operator<< function
+std::ostream &operator<<(std::ostream &os, const PlayerLevel &level) { //todo: delete me!!
+    // Output the goals, cards, and id of the PlayerLevel object
+    os << level.goals << ":" << level.cards << ":" << level.id;
+    return os;
+}

@@ -1,6 +1,7 @@
 #ifndef DAST_EX1_PLAYER_H
 #define DAST_EX1_PLAYER_H
 #include <iostream>
+#include <sstream>
 
 class Team;
 class PlayerLevel {
@@ -16,7 +17,15 @@ public:
 	bool operator>(const PlayerLevel & otherlevel);//(PlayerLevel* level1, PlayerLevel* level2);
     bool operator==(const PlayerLevel & otherlevel);
     bool operator<(const PlayerLevel & otherlevel);
+    friend std::ostream &operator<<(std::ostream &os, const PlayerLevel &level); //todo: delete me!!
+    std::string operator+(const PlayerLevel &level) { //todo: delete me!!
+        std::stringstream ss;
+        ss << level.goals << ":" << level.cards << ":" << level.id ;
+        return ss.str();
+    }
 };
+
+
 
 
 class Player {
@@ -39,26 +48,29 @@ public:
 	void update_level();
     bool operator> (const Player& other) const;
 	int get_total_games_played();
+    int abstract(int v) {
+        if (v>=0) return v; else return -1*v;
+    }
     Player * getCloset(){
         if (next_up== nullptr){return next_down;}
         if (next_down== nullptr){return next_up;}
         if (next_down->goals!=next_up->goals) {
             int downDelta = goals-next_down->goals;
             int upDelta = goals-next_up->goals;
-            if (downDelta*downDelta<upDelta*upDelta) return next_down;
-			if (downDelta*downDelta>upDelta*upDelta) return next_up;
+            if ((long)downDelta*(long)downDelta<(long)upDelta*(long)upDelta) return next_down;
+			if ((long)downDelta*(long)downDelta>(long)upDelta*(long)upDelta) return next_up;
         }
         if (next_down->cards!=next_up->cards) {
             int downDelta = cards-next_down->cards;
             int upDelta = cards-next_up->cards;
-            if (downDelta*downDelta<upDelta*upDelta) return next_down;
-			if (downDelta*downDelta>upDelta*upDelta) return next_up;
+            if ((long)downDelta*(long)downDelta<(long)upDelta*(long)upDelta) return next_down;//if (downDelta*downDelta<upDelta*upDelta) return next_down;
+			if ((long)downDelta*(long)downDelta>(long)upDelta*(long)upDelta) return next_up;
         }
         if (next_down->id!=next_up->id) {
             int downDelta = id-next_down->id;
             int upDelta = id-next_up->id;
-            if (downDelta*downDelta<upDelta*upDelta) return next_down;
-            else if (downDelta*downDelta>upDelta*upDelta) return next_up;
+            if ((long)downDelta*(long)downDelta<(long)upDelta*(long)upDelta) return next_down;//if (downDelta*downDelta<upDelta*upDelta) return next_down;
+            if ((long)downDelta*(long)downDelta>(long)upDelta*(long)upDelta) return next_up;
         }
         if (next_down->id>next_up->id) return next_down;
         else return next_up;

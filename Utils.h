@@ -24,6 +24,63 @@
 //}
 //
 template <typename K,typename V>
+void printBT(const std::string& prefix, const std::shared_ptr<Node<K,V>> node, bool isLeft)
+{
+    if( node != nullptr )
+    {
+        std::cout << prefix;
+
+        std::cout << (isLeft ? "├──" : "└──" );
+//        std::cout << (isLeft ? "+++" : "---" );
+
+        // print the value of the node
+        std::string parentkey = "None";
+        std::stringstream ss;
+        if (node->parent!= nullptr){
+            ss<<node->parent->key;
+            parentkey = ss.str();
+        }
+        std::string leftkey = "None";
+        std::stringstream ss1;
+        if (node->left!= nullptr){
+//            leftkey = std::to_string(node->left->key);
+            ss1<<node->left->key;
+            leftkey = ss1.str();
+        }
+        std::string rightkey = "None";
+        std::stringstream ss2;
+        if (node->right!= nullptr){
+//            rightkey =  std::to_string(node->right->key);
+            ss2<<node->right->key;
+            rightkey = ss2.str();
+        }
+        std::stringstream ss3;
+        std::string height = "None";
+        height =  std::to_string(node->height);
+
+
+        std::stringstream ss4;
+        std::string mykey = "None";
+//        mykey =  std::to_string(node->key);
+        ss4<<node->key;
+        mykey = ss4.str();
+
+        std::cout <<"(" <<mykey<<",p:"<<parentkey<<",l:"<<leftkey<<",r:"<<rightkey<<",h:"<<height<<")" << std::endl;
+
+        // enter the next tree level - left and right branch
+        printBT( prefix + (isLeft ? "│   " : "    "), node->left, true);
+        printBT( prefix + (isLeft ? "│   " : "    "), node->right, false);
+    }
+}
+
+template <typename K,typename V>
+void printBT(const std::shared_ptr<Node<K,V>> node)
+{
+    printBT("", node, false);
+}
+
+
+template <typename K,typename V>
 void printBT(const std::string& prefix, const Node<K,V> * node, bool isLeft)
 {
     if( node != nullptr )
@@ -35,21 +92,35 @@ void printBT(const std::string& prefix, const Node<K,V> * node, bool isLeft)
 
         // print the value of the node
         std::string parentkey = "None";
+        std::stringstream ss;
         if (node->parent!= nullptr){
-            parentkey =  std::to_string(node->parent->key);
+            ss<<node->parent->key;
+            parentkey = ss.str();
         }
         std::string leftkey = "None";
+        std::stringstream ss1;
         if (node->left!= nullptr){
-            leftkey = std::to_string(node->left->key);
+//            leftkey = std::to_string(node->left->key);
+            ss1<<node->left->key;
+            leftkey = ss1.str();
         }
         std::string rightkey = "None";
+        std::stringstream ss2;
         if (node->right!= nullptr){
-            rightkey =  std::to_string(node->right->key);
+//            rightkey =  std::to_string(node->right->key);
+            ss2<<node->right->key;
+            rightkey = ss2.str();
         }
+        std::stringstream ss3;
         std::string height = "None";
         height =  std::to_string(node->height);
+
+
+        std::stringstream ss4;
         std::string mykey = "None";
-        mykey =  std::to_string(node->key);
+//        mykey =  std::to_string(node->key);
+        ss4<<node->key;
+        mykey = ss4.str();
 
         std::cout <<"(" <<mykey<<",p:"<<parentkey<<",l:"<<leftkey<<",r:"<<rightkey<<",h:"<<height<<")" << std::endl;
 

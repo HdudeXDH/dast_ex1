@@ -22,6 +22,7 @@
 #include "Team.h"
 #include "LinkedList.h"
 #include "memory"
+#include "Utils.h" //todo: delete!!
 typedef int Team_id;
 typedef int Player_id;
 class world_cup_t {
@@ -38,6 +39,7 @@ private:
     std::shared_ptr<LinkedList<int, int>> export_lagitimate_teams_to_list(int minTeamId, int maxTeamId);
     void renew_player_nextup_nextdown(std::shared_ptr<Node<PlayerLevel, Player*>> player_node);
 	void Recursive_export_legitimate_teams_to_list(std::shared_ptr<Node<int, Team*>> root, std::shared_ptr<LinkedList<int, int>> list, int minId, int maxId);
+    void printPlayersNextups();
 	
 public:
 	// <DO-NOT-MODIFY> {

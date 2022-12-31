@@ -292,9 +292,8 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     newteam->points= team1->points+team2->points;
 	newteam->games_played = 0;
     if (newteam->is_legitimate_for_match()) legitimate_teams.add(newTeamId, newteam);
-    if (team1->top_scorrer==nullptr||team2->top_scorrer==nullptr) {newteam->top_scorrer= team1->top_scorrer==nullptr?team2->top_scorrer:team1->top_scorrer;} else
-    if (team1->top_scorrer->level>team2->top_scorrer->level) {newteam->top_scorrer= team1->top_scorrer;}
-    else {newteam->top_scorrer= team2->top_scorrer;}
+    if (team1->top_scorrer!= nullptr && team2->top_scorrer!= nullptr && team1->top_scorrer->level>team2->top_scorrer->level) {newteam->top_scorrer= team1->top_scorrer;}
+    else {newteam->top_scorrer= team2->top_scorrer!= nullptr ? team2->top_scorrer : team1->top_scorrer;}
     if (teamId1!=newTeamId){
         teams.remove_by_key(teamId1);
     }

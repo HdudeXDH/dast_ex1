@@ -57,8 +57,8 @@ public:
         if (next_down->id!=next_up->id) {
 			long downDelta = id-next_down->id;
 			long upDelta = id-next_up->id;
-			if (downDelta*downDelta<upDelta*upDelta) return next_down;
-			if (downDelta*downDelta>upDelta*upDelta) return next_up;
+            if (downDelta*downDelta<upDelta*upDelta) return next_down;
+            else if (downDelta*downDelta>upDelta*upDelta) return next_up;
         }
         if (next_down->id>next_up->id) return next_down;
         else return next_up;

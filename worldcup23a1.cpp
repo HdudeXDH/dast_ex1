@@ -32,7 +32,6 @@ StatusType world_cup_t::add_team(int teamId, int points)
 	catch (std::bad_alloc& err){
 		return StatusType::ALLOCATION_ERROR;
 	}
-//    printPlayersNextups();
 	return StatusType::SUCCESS;
 }
 
@@ -109,7 +108,6 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 	catch (std::bad_alloc& err){
 		return StatusType::ALLOCATION_ERROR;
 	}
-//    printPlayersNextups();
 	return StatusType::SUCCESS;
 }
 
@@ -165,9 +163,6 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
     Player * player = &(player_node_in_id_tree->value);
     if (player->next_down != nullptr) {player->next_down->next_up = player->next_up;}
     if (player->next_up != nullptr) {player->next_up->next_down = player->next_down;}
-//    std::cout<<"alon------"<<std::endl;
-//    printPlayersNextups();
-//    std::cout<<"alon!------"<<std::endl;
     Team * team = player->team;
 	team->remove_player_from_team(player);
     try {
@@ -187,7 +182,6 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 	} catch (std::exception& err) {
 		return StatusType::ALLOCATION_ERROR;
 	}
-//    printPlayersNextups();
 	return StatusType::SUCCESS;
 }
 
@@ -309,7 +303,6 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     }
     delete[] team2_array;
     delete[] team1_array;
-//    printPlayersNextups();
 	return StatusType::SUCCESS;
 }
 
@@ -345,27 +338,6 @@ output_t<int> world_cup_t::get_all_players_count(int teamId) {
 		return output_t<int>(players_count);
 	}
 }
-
-void print_player_ptr(std::shared_ptr<Node<PlayerLevel, Player*>> ptr){
-    if (ptr== nullptr) std::cout<<"None";
-    else  std::cout<<ptr->value->id;
-}
-void print_player_ptr(Player* ptr){
-    if (ptr== nullptr) std::cout<<"None";
-    else  std::cout<<ptr->id;
-}
-
-void world_cup_t::printPlayersNextups(){
-    std::shared_ptr<Node<PlayerLevel, Player*>>* block_array =players_by_level.export_to_array();
-    for (int i=0; i< players_by_level.size;i++){
-        std::cout<< block_array[i]->value->id <<",nextdown[";
-        print_player_ptr(block_array[i]->value->next_down);
-        std::cout<<"],nextup[";
-        print_player_ptr(block_array[i]->value->next_up);
-        std::cout<<"]"<<std::endl;
-    }
-}
-
 StatusType world_cup_t::get_all_players(int teamId, int *const output)
 {
     if (teamId == 0 || output == nullptr) {
@@ -417,8 +389,6 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 	if(players_by_id.size == 1) {
 		return StatusType::FAILURE;
 	}
-//    printBT(players_by_level.root.get());
-//    printPlayersNextups();
 	return player_node->value->getCloset()->id;
 }
 
@@ -457,7 +427,6 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 	}
 	assert(playing_teams->size == 1);
 	int winner = playing_teams->head->next->key;
-//    printPlayersNextups();
 	return output_t<int>(winner);
 }
 
